@@ -13,7 +13,7 @@ function aggiungiWatchlist(id, tipo, titolo, poster){
                    "&titolo=" + encodeURIComponent(titolo) + 
                    "&poster=" + encodeURIComponent(poster);
 
-    fetch('/watchlist.php', {
+    fetch('watchlist.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

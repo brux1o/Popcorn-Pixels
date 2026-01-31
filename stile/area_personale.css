@@ -8,9 +8,12 @@ body {
     background-color: #48494B;
     color: #E0E0E0;
     font-family: 'Cambria', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Hover globale testi (giallo) */
+/* Hover globale testi */
 h1, h2, h3, h4, p, span, strong, label {
     transition: color 0.3s ease, transform 0.3s ease;
 }
@@ -35,6 +38,7 @@ header {
     background-color: #3A3B3D;
     padding: 15px 25px;
     border-bottom: 2px solid #5A5B5E;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 #sinistra .tasto {
@@ -46,12 +50,6 @@ header {
 
 #sinistra .tasto:hover {
     transform: scale(1.2);
-}
-
-#centro img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
 }
 
 #zona-utente {
@@ -99,6 +97,7 @@ header {
     max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
+    flex: 1;
 }
 
 /* =====================================================
@@ -116,7 +115,6 @@ header {
     transform: scale(1.04);
 }
 
-/* header profilo */
 .profile-header {
     display: flex;
     align-items: center;
@@ -124,7 +122,6 @@ header {
     margin-bottom: 25px;
 }
 
-/* avatar */
 .profile-avatar {
     width: 140px;
     height: 140px;
@@ -134,7 +131,6 @@ header {
     box-shadow: 0 0 15px rgba(255,215,0,0.5);
 }
 
-/* dati utente */
 .profile-data p {
     font-size: 1.1rem;
     margin: 5px 0;
@@ -145,7 +141,9 @@ header {
     margin-bottom: 10px;
 }
 
-/* statistiche */
+/* =====================================================
+   STATISTICHE
+===================================================== */
 .profile-stats {
     display: flex;
     justify-content: space-around;
@@ -283,6 +281,7 @@ header {
     font-size: 0.9rem;
     color: #ccc;
 }
+
 .action-icons {
     display: flex;
     justify-content: center;
@@ -290,7 +289,9 @@ header {
     margin-top: 10px;
 }
 
-/* stile base comune */
+/* =====================================================
+   BOTTONI AZIONE
+===================================================== */
 .btn-edit,
 .btn-delete {
     background: rgba(0, 0, 0, 0.4);
@@ -300,13 +301,9 @@ header {
     border: 2px solid transparent;
     cursor: pointer;
     font-size: 16px;
-    transition: 
-        transform 0.3s ease,
-        box-shadow 0.3s ease,
-        background-color 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
 }
 
-/* MODIFICA */
 .btn-edit {
     border-color: #FFD700;
 }
@@ -317,7 +314,6 @@ header {
     transform: scale(1.2);
 }
 
-/* ELIMINA */
 .btn-delete {
     border-color: #ff4d4d;
 }
@@ -326,4 +322,16 @@ header {
     background-color: rgba(255, 77, 77, 0.15);
     box-shadow: 0 0 12px rgba(255, 77, 77, 0.9);
     transform: scale(1.2);
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+footer {
+    background-color: #3A3B3D;
+    border-top: 2px solid #5A5B5E;
+    padding: 15px;
+    text-align: center;
+    color: #E0E0E0;
+    font-size: 0.9rem;
 }
