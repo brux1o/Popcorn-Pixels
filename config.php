@@ -5,7 +5,7 @@
 
 define('DB_HOST', 'localhost');
 define('DB_PORT', '5432');
-define('DB_NAME', 'TW');     
+define('DB_NAME', 'gruppo02');     
 define('DB_USER', 'www');
 define('DB_PASS', 'www');
 ?>

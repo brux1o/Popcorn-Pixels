@@ -3,7 +3,7 @@
 session_start();
 
 // 1. Il "Buttafuori": se sei già loggato, vai alla home
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['username'])) {
     header("Location: struttura.html");
     exit();
 }
@@ -18,14 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_raw = $_POST['password'] ?? '';
 
     // 2. Accesso Ibrido: cerchiamo sia per username che per email
-    $sql = "SELECT id, username, password FROM utenti WHERE username = $1 OR email = $1";
+    $sql = "SELECT id, username, password FROM utente WHERE username = $1 OR email = $1";
     $result = pg_query_params($db, $sql, array($identificativo));
 
     if ($result && pg_num_rows($result) > 0) {
         $user_data = pg_fetch_assoc($result);
         
         if (password_verify($password_raw, $user_data['password'])) {
-            $_SESSION['user_id'] = $user_data['id'];
+            $_SESSION['username'] = $user_data['id'];
             $_SESSION['username'] = $user_data['username'];
             
             header("Location: struttura.html"); 
