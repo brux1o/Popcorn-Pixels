@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="it">
+<head>
+    <title>PopCorn&Pixels</title>
+    <meta charset="UTF-8"> 
+    <meta name="viewport " content="width=device-width,initial-scale=1.0">
+    <link rel="icon" type="image/png" href="resources/icona.png">
+    <meta name="description" content="QUESTA SARA' LA HOMEPAGE DEL SITO">
+    <link rel="stylesheet " href="stylehp.css">
+    
+</head>
+
+<body>
+ <header class="header"> <!-- HEADER DELLA PAGINA CONTENTE LA BARRA CON NOME SITO,OPZIONE DI RICERCA E DI LOGIN -->
+  
+   <div class="button-container">
+        <button id="registerButton">
+        <img src="resources/uente.png" alt="registrazione" style="width: 50px; height:50px;">
+        </button>
+   
+
+    <div id="userMenu" class=" user-menu hidden"></div>
+   </div>
+    <div class="title-container">
+        <h1>PopCorn&Pixel</h1> 
+   </div>
+  
+   <div class="button-container">
+        <button id="searchButton">
+        <img src="resources/ricerca.png" alt="ricerca" style="width: 50px; height:50px;">
+        </button>
+    </div>
+ 
+ </header>
+<h2 id="welcomeText"></h2>
+
+ <!-- USCITE RECENTI -->
+  <section class="section">
+    <h2>USCITE RECENTI</h2>
+    <div id="latestMovies" class="movie-grid">
+      <!-- Film recenti dall'API -->
+    </div>
+
+
+
+  </section>
+  <!-- FILM PIÙ POPOLARI -->
+  <section class="section">
+    <h2>FILM PIÙ POPOLARI</h2>
+    <div id="popularMovies" class="scroll-container">
+      <!-- Film popolari dall'API -->
+    </div>
+  </section>
+
+
+
+  <!-- SERIE TV PIÙ POPOLARI -->
+  <section class="section">
+    <h2>SERIE TV PIÙ POPOLARI</h2>
+    <div id="popularSeries" class="scroll-container">
+      <!-- Serie TV popolari dall'API -->
+    </div>
+  </section>
+
+
+<script src="gestione.js"></script>
+
+</body>
+
+
+
+</html>
