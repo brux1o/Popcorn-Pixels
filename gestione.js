@@ -55,7 +55,7 @@ function creaItem(item, isSeries = false) {
         </div>
     `;
         div.addEventListener('click', () => {
-        visualizzaElemento(
+        apriDettaglio(
             item.id,
             isSeries ? 'tv' : 'movie'
         );
