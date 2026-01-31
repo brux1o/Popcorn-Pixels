@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['username'])) {
     header("Location: struttura.html");
     exit();
 }
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $risposta = $_POST['risposta_sicurezza'] ?? '';
     $password_hash = password_hash($password_raw, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO utenti (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza) 
+    $sql = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id";
     
     $result = pg_query_params($db, $sql, array($nome, $cognome, $email, $username, $password_hash, $domanda, $risposta));

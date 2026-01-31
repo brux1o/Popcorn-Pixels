@@ -24,9 +24,16 @@
                        WHERE c.id_contenuto = $1 AND c.tipo_contenuto = $2 
                        ORDER BY c.data_inserimento DESC";
 
-    $prep_c = pg_prepare($db, "get_comments", $query_commenti);
-    $res_c = pg_execute($db, "get_comments", array($idContent, $typeContent));
-    $commenti = pg_fetch_all($res_c);
+    $res_c = pg_query_params($db, $query_commenti, array($idContent, $typeContent));
+
+    $commenti = []; // Preparo un array vuoto
+    if ($res_c) {
+        // Se la query funziona, provo a estrarre i dati
+        $data = pg_fetch_all($res_c);
+        if ($data) {
+            $commenti = $data;
+        }
+    }
 
     // Chiamata API TMDB
     $endpoint = ($typeContent == 'tv') ? "/tv/" : "/movie/";
@@ -169,7 +176,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="resources/icona.png">
     <title><?php echo $titolo; ?> - Dettagli</title>
-    <link rel="stylesheet" href="dettaglio_css.css">
+    <link rel="stylesheet" href="stile/dettaglio_css.css">
 </head>
 <body style="background-image: <?php echo $bgStyle; ?>;">
 
@@ -202,8 +209,8 @@
                     </div>
                     
                     <div class="dropdown-content">
-                        <a href="profilo.php">👤 Il mio Profilo</a>
-                        <a href="../backend/logout.php" style="color: #ff5555;">🚪 Logout</a>
+                        <a href="paginapersonale.html">👤 Il mio Profilo</a>
+                        <a href="login.php" style="color: #ff5555;">🚪 Logout</a>
                     </div>
                 </div>
 
@@ -348,7 +355,7 @@
     </main>
 
     <footer>
-        <? include '/footer.php'; ?>
+        <?php include 'footer.php'; ?>
     </footer>
 
     <?php include 'aggiungiPreferiti.php'; ?>
