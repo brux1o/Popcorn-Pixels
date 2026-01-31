@@ -1,41 +1,64 @@
-/* RESET E BASE */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ======== RESET E STRUTTURA ======== */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
 
 html, body {
     height: 100%;
     width: 100%;
+    overflow-x: hidden;
 }
 
 body {
+    /* Sfondo statico senza keyframes */
     background: #1a1a1a;
     background: linear-gradient(120deg, #1a1a1a, #222222, #1a1a1a);
-    background-size: 300% 300%;
-    animation: bgMove 12s ease infinite;
     color: #e8e8e8;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    flex-direction: column; /* Header -> Main -> Footer */
+}
+
+/* ======== NAVBAR ======== */
+header { 
+    flex: 0 0 auto; 
+    width: 100%; 
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.nav-button {
+    color: #d4a017;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px 20px;
+    border: 1px solid rgba(212, 160, 23, 0.4);
+    border-radius: 25px;
+    transition: 0.3s;
+}
+
+.nav-button:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ======== CENTRATURA CONTENUTO ======== */
+main {
+    flex: 1 0 auto; 
     display: flex;
     flex-direction: column;
-}
-
-@keyframes bgMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* NAVBAR */
-header { flex: 0 0 auto; width: 100%; }
-.navbar { display: flex; justify-content: space-between; padding: 20px 40px; }
-.nav-button { color: #d4a017; text-decoration: none; font-weight: bold; transition: 0.3s; }
-/* Scritte cliccabili della navbar diventano bianche [cite: 89, 90] */
-.nav-button:hover { color: #fff; }
-
-main {
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column; /* Mette titolo e form in verticale */
-    justify-content: center; /* Centra verticalmente */
-    align-items: center;     /* Centra orizzontalmente */
+    justify-content: center;
+    align-items: center;
     padding: 40px 20px;
 }
 
@@ -44,15 +67,15 @@ main {
     max-width: 450px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centra tutto il contenuto del wrapper */
+    align-items: center;
 }
 
-/* TITOLI CENTRATI */
+/* ======== FORM E TITOLI ======== */
 .page-title {
     color: #d4a017;
-    font-size: 36px;
+    font-size: 32px;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     text-align: center;
 }
 
@@ -62,21 +85,30 @@ main {
     text-align: center;
 }
 
-/* IL FORM */
 form {
     background: #262626;
-    padding: 30px;
+    padding: 35px;
     border-radius: 15px;
     border: 1px solid #333;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
-    width: 100%; /* Occupa tutto il page-wrapper */
+    box-shadow: 0 15px 45px rgba(0,0,0,0.7);
+    width: 100%;
 }
 
-/* LAYOUT CAMPI AFFIANCATI */
-.form-row { display: flex; gap: 15px; width: 100%; }
+.form-row { 
+    display: flex; 
+    gap: 15px; 
+    width: 100%; 
+}
+
 .form-group { flex: 1; }
 
-label { color: #d4a017; display: block; margin-bottom: 5px; font-size: 13px; font-weight: bold; }
+label { 
+    color: #d4a017; 
+    display: block; 
+    margin-bottom: 5px; 
+    font-size: 13px; 
+    font-weight: bold; 
+}
 
 input, select {
     width: 100%;
@@ -88,7 +120,7 @@ input, select {
     margin-bottom: 15px;
 }
 
-/* BOTTONE ACCEDI / REGISTRATI */
+/* ======== BOTTONE INVIO ======== */
 button {
     width: 100%;
     padding: 15px;
@@ -102,15 +134,18 @@ button {
     transition: 0.3s;
 }
 
-/* La scritta sul bottone diventa bianca [cite: 90] */
 button:hover {
     background: #b88a12;
-    color: #fff; 
-    box-shadow: 0 5px 15px rgba(212, 160, 23, 0.4);
+    color: #fff; /* Scritta bianca come richiesto */
+    transform: translateY(-2px);
 }
 
-/* Link nel footer del form diventano bianchi */
-.form-footer a { color: #d4a017; text-decoration: none; font-weight: bold; }
-.form-footer a:hover { color: #fff; text-decoration: underline; }
-
-footer { padding: 20px; text-align: center; color: #555; font-size: 12px; }
+/* ======== FOOTER ======== */
+footer {
+    flex: 0 0 auto;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    color: #555;
+    font-size: 12px;
+}
