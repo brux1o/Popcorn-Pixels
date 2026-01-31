@@ -221,6 +221,8 @@ h2:hover {
 .header .button-container button img {
     width: 32px;
     height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* ================= STATO UTENTE ================= */
