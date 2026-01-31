@@ -1,12 +1,12 @@
 <?php
-    require_once __DIR__ .'/db.php';
+    require_once '/db.php';
     
-    // Avvio sessione se non attiva
+   
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    require_once __DIR__ . '/aggiornamentoStato.php';
+    require_once '/aggiornamentoStato.php';
 
     $logger = isset($_SESSION['username']);
     $idContent = isset($_GET['id']) ? $_GET['id'] : '';
@@ -167,6 +167,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="resources/icona.png">
     <title><?php echo $titolo; ?> - Dettagli</title>
     <link rel="stylesheet" href="dettaglio_css.css">
 </head>
