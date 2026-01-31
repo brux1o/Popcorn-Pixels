@@ -10,45 +10,29 @@ html, body {
 
 .header {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 15px 20px;
   background-color: #3A3B3D;
   border-bottom: 2px solid #5A5B5E;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  column-gap: 15px;
 }
 
-/* bottone registrazione */
-.button-container {
-  display: flex;
-  align-items: center;
+/* SINISTRA: bottone + zona utente */
+.header > .button-container:first-child,
+#zona-utente {
+  justify-self: start;
 }
 
-.button-container button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  transition: transform 0.3s ease, filter 0.3s ease;
+/* CENTRO: TITOLO DAVVERO CENTRATO */
+.title-container {
+  justify-self: center;
+  text-align: center;
 }
 
-.button-container button:hover {
-  transform: scale(1.1);
-  filter: brightness(1.3);
-}
-
-.button-container img {
-  width: 50px;
-  height: 50px;
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.button-container img:hover {
-  transform: scale(1.1);
-  filter: brightness(1.3);
+/* DESTRA: ricerca */
+.header > .button-container:last-child {
+  justify-self: end;
 }
 
 /* zona utente */
