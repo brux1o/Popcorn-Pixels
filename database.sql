@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS codici_backup;
 DROP TABLE IF EXISTS utente CASCADE; 
 -- Nota: CASCADE elimina anche eventuali dipendenze rimaste
 
--- 2. CREAZIONE TABELLA UTENTE (Deve essere la prima!)
+-- 2. CREAZIONE TABELLA UTENTE
 CREATE TABLE utente (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
