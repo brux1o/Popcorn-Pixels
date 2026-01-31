@@ -316,7 +316,7 @@
 
     <div class="comment-form-container">
         <?php if(isset($_SESSION['username'])): ?>
-            <form action="/salva_commento.php" method="POST" class="comment-form">
+            <form action="salva_commento.php" method="POST" class="comment-form">
                 <input type="hidden" name="id_contenuto" value="<?php echo $idContent; ?>">
                 <input type="hidden" name="tipo" value="<?php echo $typeContent; ?>">
                 
