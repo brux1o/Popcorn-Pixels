@@ -64,13 +64,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Recupero - Cinema Project</title>
     <link rel="stylesheet" href="stile/accesso.css">
-    <link rel="icon" type="image/png" href="sources/icona.png">
+    <link rel="icon" type="image/png" href="resources/icona.png">
     <script src="stile/validation.js"></script>
 </head>
 <body>
     <header>
         <nav class="navbar">
-            <div class="nav-center"><img src="sources/icona.png" class="nav-logo"></div>
+            <div class="nav-center"><img src="resources/icona.png" class="nav-logo"></div>
             <div class="nav-right"><a href="login.php" class="nav-button">Indietro</a></div>
         </nav>
     </header>
