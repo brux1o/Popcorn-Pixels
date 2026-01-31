@@ -1,35 +1,36 @@
-<?php 
-
+<?php
 session_start();
-require 'db.php';
+require_once __DIR__ . '/db.php';
 
 if (!isset($_SESSION['username'])) {
     exit();
 }
 
-$idutente = $_SESSION['username'];
+$username_session = $_SESSION['username'];
 
-/* controllo dati dal JS */
+$query_user = "SELECT id FROM utente WHERE username = $1";
+$res_user = pg_query_params($db, $query_user, array($username_session));
+
+if (!$res_user || pg_num_rows($res_user) === 0) {
+    exit();
+}
+
+$row_user = pg_fetch_assoc($res_user);
+$real_user_id = $row_user['id'];
+
 if (!isset($_POST['id'])) {
     exit();
 }
 
-$preferito_id = $_POST['id'];
+$content_id = $_POST['id'];
 
-/* query delete */
-$sql = "
-    DELETE FROM preferiti
-    WHERE id = $1 AND id_utente = $2
-";
+$sql = "DELETE FROM preferiti WHERE content_id = $1 AND user_id = $2";
 
-$result = pg_query_params(
-    $db,
-    $sql,
-    array($preferito_id, $idutente)
-);
+$result = pg_query_params($db, $sql, array($content_id, $real_user_id));
 
-if ($result) {
+if ($result && pg_affected_rows($result) > 0) {
     echo 'OK';
 } else {
     echo 'ERRORE';
 }
+?>

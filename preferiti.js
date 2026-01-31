@@ -1,46 +1,45 @@
-
-
 document.addEventListener('DOMContentLoaded', async () => {
 
-const preferitiSection = document.getElementById('preferiti');
-const movieGrid = preferitiSection.querySelector('.movie-grid');
+    const preferitiSection = document.getElementById('preferiti');
+    if (!preferitiSection) return;
 
+    const movieGrid = preferitiSection.querySelector('.movie-grid');
 
-const response = await fetch('get_preferiti.php');
-const preferiti = await response.json();
+    const response = await fetch('get_preferiti.php');
+    const preferiti = await response.json();
 
- preferiti.forEach(preferito => {
+    preferiti.forEach(preferito => {
         creaPreferito(preferito);
     });
 
-function creaPreferito(preferito){
- const card = document.createElement('div');
+    function creaPreferito(preferito){
+        const card = document.createElement('div');
         card.classList.add('movie-card');
 
-       const posterUrl = preferito.poster_path
+        const posterUrl = preferito.poster_path
         ? `https://image.tmdb.org/t/p/w500${preferito.poster_path}`
         : 'https://placehold.jp/300x450.png?text=Immagine+non+disponibile';
 
-    card.innerHTML = `
-        <img src="${posterUrl}" alt="${preferito.titolo}">
-        <h4>${preferito.titolo}</h4>
+        card.innerHTML = `
+            <img src="${posterUrl}" alt="${preferito.titolo}">
+            <h4>${preferito.titolo}</h4>
 
-        <div class="action-icons">
-            <button class="btn-delete" data-id="${preferito.id}" title="Rimuovi dai preferiti">
-                🗑️
-            </button>
-        </div>
-    `;
+            <div class="action-icons">
+                <button class="btn-delete" data-id="${preferito.content_id}" title="Rimuovi dai preferiti">
+                    🗑️
+                </button>
+            </div>
+        `;
 
         movieGrid.appendChild(card);
+    }
 
-}
+    movieGrid.addEventListener('click', async (e) => {
 
-movieGrid.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.btn-delete');
+        if (!btn) return;
 
-        if (!e.target.classList.contains('btn-delete')) return;
-
-        const preferitoId = e.target.dataset.id;
+        const preferitoId = btn.dataset.id;
 
         if (!confirm('Vuoi rimuovere questo contenuto dai preferiti?')) return;
 
@@ -54,13 +53,11 @@ movieGrid.addEventListener('click', async (e) => {
 
         const result = await response.text();
 
-        if (result === 'OK') {
-            e.target.closest('.movie-card').remove();
+        if (result.trim() === 'OK') {
+            btn.closest('.movie-card').remove();
         } else {
             alert('Errore durante la rimozione dai preferiti');
         }
     });
-
-
 
 });
