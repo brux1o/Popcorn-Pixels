@@ -13,7 +13,8 @@ const nomeUtente = document.getElementById("nome-utente");
 
 const searchButton = document.getElementById('searchButton');
 
-searchButton.addEventListener('click', () => {
+searchButton.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
     window.location.href = 'ricerca.php';
 });
 
