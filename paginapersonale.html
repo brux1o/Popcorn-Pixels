@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Personale</title>
+    <link rel="icon" type="image/png" href="resources/icona.png">
+    <meta name="description" content="QUESTA SARA' LA HOMEPAGE DEL SITO">
+    <link rel="stylesheet" href="area_personale.css">
+</head>
+
+<body>
+
+<header>
+    <div id="sinistra">
+        <a href="index.html" class="tasto back-text"> ←</a>
+    </div>
+
+    <div id="zona-utente">
+        <div class="info-testo-utente">
+            <span id="stato-utente">Online</span>
+            <span id="nome-utente">Username</span>
+        </div>
+        <button class="tasto">
+            <img src="resources/utente.png" alt="Profilo">
+        </button>
+    </div>
+</header>
+
+<main class="main">
+
+    <!-- PROFILO -->
+    <section class="profile-card">
+
+        <div class="profile-header">
+            <img src="resources/utente.png" alt="Avatar" class="profile-avatar">
+
+            <div class="profile-data">
+                <h2 class="username">@Username</h2>
+                <p><strong>Nome:</strong> <span id="user-nome">-</span></p>
+                <p><strong>Cognome:</strong> <span id="user-cognome">-</span></p>
+                <p><strong>Email:</strong> <span id="user-email">-</span></p>
+            </div>
+        </div>
+          <!-- ✅ STATISTICHE UTENTE  -->
+        <div class="profile-stats">
+            <div class="stat-box">
+                <strong id="num-preferiti">0</strong>
+                <span>Preferiti</span>
+            </div>
+            <div class="stat-box">
+                <strong id="num-watchlist">0</strong>
+                <span>Da vedere</span>
+            </div>
+            <div class="stat-box">
+                <strong id="num-commenti">0</strong>
+                <span>Commenti</span>
+            </div>
+        </div>
+        
+
+    </section>
+
+    <!-- TABS -->
+    <div class="profile-tabs">
+        <button class="tab active" data-tab="preferiti">❤️ Preferiti</button>
+        <button class="tab" data-tab="watchlist">👀 Da vedere</button>
+        <button class="tab" data-tab="commenti">✍️ Commenti</button>
+    </div>
+
+    <!-- CONTENUTI -->
+
+    <!-- PREFERITI -->
+    <section id="preferiti" class="tab-content active">
+        <div class="movie-grid">
+            <!-- film preferiti caricati da preferiti.js -->
+        </div>
+    </section>
+
+    <!-- WATCHLIST -->
+    <section id="watchlist" class="tab-content">
+        <div class="movie-grid">
+            <!-- film watchlist caricati da watchlist.js -->
+        </div>
+    </section>
+
+    <!-- COMMENTI -->
+    <section id="commenti" class="tab-content">
+        <!-- commenti caricati da commenti.js -->
+    </section>
+
+</main>
+
+<!-- SCRIPT TABS -->
+<script>
+const tabs = document.querySelectorAll('.tab');
+const contents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+});
+</script>
+
+<!-- SCRIPT APP -->
+<script src="utente.js"></script>
+<script src="preferiti.js"></script>
+<script src="watchlist.js"></script>
+<script src="commenti.js"></script>
+<script src="stats.js"></script>
+
+</body>
+</html>
