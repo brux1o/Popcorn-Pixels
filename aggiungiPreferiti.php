@@ -13,7 +13,7 @@ function aggiungiPreferiti(id, tipo, titolo, poster){
                    "&titolo=" + encodeURIComponent(titolo) + 
                    "&poster=" + encodeURIComponent(poster);
 
-    fetch('/preferiti.php', {
+    fetch('preferiti.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: params
@@ -36,7 +36,7 @@ function aggiungiPreferiti(id, tipo, titolo, poster){
             let risposta = prompt("Hai raggiunto il limite di 5 preferiti!\nScrivi il titolo esatto del film da rimuovere per far posto a questo:");
 
             if (risposta !== null && risposta.trim() !== "") {
-                fetch('/preferiti.php', {
+                fetch('preferiti.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params + "&action=scambio&titolo_da_rimuovere=" + encodeURIComponent(risposta)

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/database.php'; 
+require_once 'db.php'; 
 
 session_start();
 header('Content-Type: application/json'); 
@@ -9,7 +9,16 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$userId = $_SESSION['username'];
+$username_session = $_SESSION['username'];
+$query_user = "SELECT id FROM utente WHERE username = $1";
+$res_user = pg_query_params($db, $query_user, array($username_session));
+
+if (!$res_user || pg_num_rows($res_user) === 0) {
+    echo json_encode(['success' => false, 'message' => 'Utente non trovato nel database.']);
+    exit;
+}
+$row = pg_fetch_assoc($res_user);
+$real_user_id = $row['id']; 
 
 $contentId = $_POST['id'] ?? null;
 $contentType = $_POST['type'] ?? null;
@@ -32,11 +41,7 @@ if ($action === 'scambio') {
     }
 
     $query_delete = "DELETE FROM preferiti WHERE user_id = $1 AND titolo = $2";
-    
-
-    $stmt_del = pg_prepare($db, "delete_swap", $query_delete);
-    $result_del = pg_execute($db, "delete_swap", array($userId, $titoloDaRimuovere));
-
+    $result_del = pg_query_params($db, $query_delete, array($real_user_id, $titoloDaRimuovere));
 
     if (pg_affected_rows($result_del) == 0) {
         echo json_encode([
@@ -46,11 +51,10 @@ if ($action === 'scambio') {
         exit;
     }
 
-    $query_insert = "INSERT INTO preferiti (username, content_id, tipo_content, titolo, poster_path) 
+    $query_insert = "INSERT INTO preferiti (user_id, content_id, tipo_content, titolo, poster_path) 
                      VALUES ($1, $2, $3, $4, $5)";
     
-    $stmt_ins = pg_prepare($db, "insert_swap", $query_insert);
-    $result_ins = pg_execute($db, "insert_swap", array($userId, $contentId, $contentType, $titolo, $poster));
+    $result_ins = pg_query_params($db, $query_insert, array($real_user_id, $contentId, $contentType, $titolo, $poster));
 
     if ($result_ins) {
         echo json_encode(['success' => true]);
@@ -60,23 +64,16 @@ if ($action === 'scambio') {
     exit;
 }
 
-
 $query_count = "SELECT COUNT(*) FROM preferiti WHERE user_id = $1";
-$stmt_count = pg_prepare($db, "check_count", $query_count);
-$result_count = pg_execute($db, "check_count", array($userId));
-
-
+$result_count = pg_query_params($db, $query_count, array($real_user_id));
 $num_preferiti = pg_fetch_result($result_count, 0, 0);
-
 
 if ($num_preferiti < 5) {
 
-    $query_insert = "INSERT INTO preferiti (username, content_id, tipo_content, titolo, poster_path) 
+    $query_insert = "INSERT INTO preferiti (user_id, content_id, tipo_content, titolo, poster_path) 
                      VALUES ($1, $2, $3, $4, $5)";
                      
-    $stmt_ins = pg_prepare($db, "insert_fav", $query_insert);
-    
-    $result = @pg_execute($db, "insert_fav", array($userId, $contentId, $contentType, $titolo, $poster));
+    $result = @pg_query_params($db, $query_insert, array($real_user_id, $contentId, $contentType, $titolo, $poster));
 
     if ($result) {
         echo json_encode(['success' => true]);

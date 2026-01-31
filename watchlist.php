@@ -1,35 +1,45 @@
 <?php
-    require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/db.php';
 
-    session_start();
-    header('Content-Type: application/json');
+session_start();
+header('Content-Type: application/json');
 
-    if(!isset($_SESSION['utente_id'])){
-        echo json_encode(['success' => false, 'message' => 'Non loggato']);
-        exit;
-    }
+if (!isset($_SESSION['username'])) {
+    echo json_encode(['success' => false, 'message' => 'Devi effettuare il login.']);
+    exit;
+}
 
-    $userId = $_SESSION['username'];
-    $contentId = $_POST['id'] ?? '';
-    $contentType = $_POST['type'] ?? '';
-    $titolo = $_POST['titolo'] ?? 'Senza Titolo';
-    $poster = $_POST['poster'] ?? '';
+$username_session = $_SESSION['username'];
+$query_user = "SELECT id FROM utente WHERE username = $1";
+$res_user = pg_query_params($db, $query_user, array($username_session));
 
-    $query = "INSERT INTO watchlist (username, content_id, tipo_content, titolo, poster_path) 
-              VALUES ($1, $2, $3, $4, $5)";
-              
-    $prep = pg_prepare($db, "add_wl", $query);
-    
-    if(!$prep) {
-        echo json_encode(['success' => false, 'message' => 'Errore tecnico (prepare)']);
-        exit;
-    }
+if (!$res_user || pg_num_rows($res_user) === 0) {
+    echo json_encode(['success' => false, 'message' => 'Utente non trovato nel database.']);
+    exit;
+}
 
-    $result = @pg_execute($db, "add_wl", array($userId, $contentId, $contentType, $titolo, $poster));
+$row = pg_fetch_assoc($res_user);
+$real_user_id = $row['id'];
 
-    if($result){
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Elemento già presente nella watchlist!']);
-    }
+$contentId = $_POST['id'] ?? '';
+$contentType = $_POST['type'] ?? '';
+$titolo = $_POST['titolo'] ?? 'Senza Titolo';
+$poster = $_POST['poster'] ?? '';
+
+$query = "INSERT INTO watchlist (user_id, content_id, tipo_content, titolo, poster_path) 
+          VALUES ($1, $2, $3, $4, $5)";
+          
+$result = @pg_query_params($db, $query, array(
+    $real_user_id, 
+    $contentId, 
+    $contentType, 
+    $titolo, 
+    $poster
+));
+
+if($result){
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Elemento già presente nella watchlist!']);
+}
 ?>
