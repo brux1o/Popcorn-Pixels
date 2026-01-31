@@ -199,6 +199,30 @@ h2:hover {
   border-radius: 5px;
 }
 
+.header .button-container button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background-color: #5A5B5E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header .button-container button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+.header .button-container button img {
+    width: 32px;
+    height: 32px;
+}
+
 /* ================= STATO UTENTE ================= */
 
 #stato-utente.online {
