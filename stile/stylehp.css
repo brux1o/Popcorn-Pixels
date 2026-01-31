@@ -7,7 +7,16 @@ html, body {
 }
 
 /* ================= HEADER FIX DEFINITIVO ================= */
+.user-menu {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    z-index: 1000;
+}
 
+.user-menu.hidden {
+    display: none;
+}
 .header {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
