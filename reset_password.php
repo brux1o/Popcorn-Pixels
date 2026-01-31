@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 1. Controllo tramite Risposta alla Domanda
     if (!empty($risposta_utente)) {
-        $sql = "SELECT risposta_sicurezza FROM utenti WHERE id = $1";
+        $sql = "SELECT risposta_sicurezza FROM utente WHERE id = $1";
         $result = pg_query_params($db, $sql, array($user_id));
         $db_risposta = pg_fetch_result($result, 0, 0);
 
