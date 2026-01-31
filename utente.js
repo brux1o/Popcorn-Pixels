@@ -1,18 +1,28 @@
-
 document.addEventListener('DOMContentLoaded', async () => {
 
     const response = await fetch('get_user.php');
 
-    if (!response.ok) { //CONTROLLO CHE IL PHP ABBIA RISPOSTO CORRETTAMENTE
+    if (!response.ok) {
         console.error('Errore nel recupero utente');
         return;
     }
 
     const utente = await response.json();
 
-    document.getElementById('user-username').textContent = '@' + utente.username;
-    document.getElementById('user-nome').textContent = utente.nome;
-    document.getElementById('user-cognome').textContent = utente.cognome;
-    document.getElementById('user-email').textContent = utente.email;
+    // Controllo se l'oggetto utente non è vuoto
+    if (Object.keys(utente).length === 0) {
+        console.error('Nessun dato utente trovato');
+        return;
+    }
+
+    const elUsername = document.getElementById('user-username');
+    const elNome = document.getElementById('user-nome');
+    const elCognome = document.getElementById('user-cognome');
+    const elEmail = document.getElementById('user-email');
+
+    if (elUsername) elUsername.textContent = utente.username;
+    if(elNome) elNome.textContent = utente.nome;
+    if(elCognome) elCognome.textContent = utente.cognome;
+    if(elEmail) elEmail.textContent = utente.email;
 
 });
