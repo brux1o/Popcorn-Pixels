@@ -210,7 +210,7 @@
                     
                     <div class="dropdown-content">
                         <a href="paginapersonale.html">👤 Il mio Profilo</a>
-                        <a href="login.php" style="color: #ff5555;">🚪 Logout</a>
+                        <a href="logout.php" style="color: #ff5555;">🚪 Logout</a>
                     </div>
                 </div>
 
