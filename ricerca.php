@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 
 <?php
-    include '../richiesta.php';
+    include '/richiesta.php';
 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    require_once __DIR__ . '/aggiornamentoStato.php';
+    require_once '/aggiornamentoStato.php';
 ?>
 
 <html>
@@ -15,7 +15,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Popcorn & Pixels</title>
-        <link rel="stylesheet" href="ricerca_css.css">
+        <link rel="stylesheet" href="stile/ricerca_css.css">
     </head>
     <body>
         <header>
@@ -46,8 +46,8 @@
                     </div>
                     
                     <div class="dropdown-content">
-                        <a href="profilo.php">👤 Il mio Profilo</a>
-                        <a href="../backend/logout.php" style="color: #ff5555;">🚪 Logout</a>
+                        <a href="/paginapersona.html">👤 Il mio Profilo</a>
+                        <a href="/login.php" style="color: #ff5555;">🚪 Logout</a>
                     </div>
                 </div>
                 
@@ -67,7 +67,7 @@
 
         </main>
         <footer>
-
+                <?php include '/footer.php'; ?>
         </footer>
         <script>
 

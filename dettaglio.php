@@ -8,7 +8,7 @@
 
     require_once __DIR__ . '/aggiornamentoStato.php';
 
-    $logger = isset($_SESSION['utente_id']);
+    $logger = isset($_SESSION['username']);
     $idContent = isset($_GET['id']) ? $_GET['id'] : '';
     $typeContent = isset($_GET['type']) ? $_GET['type'] : 'movie';
 
@@ -175,7 +175,7 @@
     <header>
         <div id="nav-sinistra">
             <a href="javascript:history.back()" class="tasto-tondo" id="btn-back">
-                <img src="back.png" alt="Torna alla ricerca">
+                ←
             </a>
         </div>
 
@@ -305,8 +305,8 @@
     </div>
 
     <div class="comment-form-container">
-        <?php if(isset($_SESSION['utente_id'])): ?>
-            <form action="../backend/salva_commento.php" method="POST" class="comment-form">
+        <?php if(isset($_SESSION['username'])): ?>
+            <form action="/salva_commento.php" method="POST" class="comment-form">
                 <input type="hidden" name="id_contenuto" value="<?php echo $idContent; ?>">
                 <input type="hidden" name="tipo" value="<?php echo $typeContent; ?>">
                 

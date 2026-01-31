@@ -9,13 +9,13 @@
         exit;
     }
 
-    $userId = $_SESSION['utente_id'];
+    $userId = $_SESSION['username'];
     $contentId = $_POST['id'] ?? '';
     $contentType = $_POST['type'] ?? '';
     $titolo = $_POST['titolo'] ?? 'Senza Titolo';
     $poster = $_POST['poster'] ?? '';
 
-    $query = "INSERT INTO watchlist (user_id, content_id, tipo_content, titolo, poster_path) 
+    $query = "INSERT INTO watchlist (username, content_id, tipo_content, titolo, poster_path) 
               VALUES ($1, $2, $3, $4, $5)";
               
     $prep = pg_prepare($db, "add_wl", $query);
