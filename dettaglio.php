@@ -216,6 +216,8 @@
         </div>  
     </header>
 
+    <main>
+
     <div class="main-wrapper">
         
         <div class="header-content">
@@ -341,6 +343,12 @@
             <?php endif; ?>
         </div>
     </div>
+
+    </main>
+
+    <footer>
+        <? include '/footer.php'; ?>
+    </footer>
 
     <?php include 'aggiungiPreferiti.php'; ?>
     <?php include 'aggiungiWatchlist.php'; ?>
