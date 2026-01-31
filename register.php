@@ -4,7 +4,7 @@ if (isset($_SESSION['user_id'])) {
     header("Location: struttura.html");
     exit();
 }
-require_once 'd.php';
+require_once 'db.php';
 
 // Variabili sticky
 $nome = $_POST['nome'] ?? '';
