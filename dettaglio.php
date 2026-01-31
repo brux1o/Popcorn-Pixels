@@ -1,12 +1,12 @@
 <?php
-    require_once '/db.php';
+    require_once 'db.php';
     
    
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    require_once '/aggiornamentoStato.php';
+    require_once 'aggiornamentoStato.php';
 
     $logger = isset($_SESSION['username']);
     $idContent = isset($_GET['id']) ? $_GET['id'] : '';
