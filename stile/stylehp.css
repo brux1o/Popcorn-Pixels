@@ -201,3 +201,14 @@ h2:hover {
   color: red;
   font-weight: bold;
 }
+/* =====================================================
+   FOOTER
+===================================================== */
+footer {
+    background-color: #3A3B3D;
+    border-top: 2px solid #5A5B5E;
+    padding: 15px;
+    text-align: center;
+    color: #E0E0E0;
+    font-size: 0.9rem;
+}

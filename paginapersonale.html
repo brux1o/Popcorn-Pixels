@@ -31,7 +31,6 @@
 
     <!-- PROFILO -->
     <section class="profile-card">
-
         <div class="profile-header">
             <img src="resources/utente.png" alt="Avatar" class="profile-avatar">
 
@@ -42,7 +41,8 @@
                 <p><strong>Email:</strong> <span id="user-email">-</span></p>
             </div>
         </div>
-          <!-- ✅ STATISTICHE UTENTE  -->
+
+        <!-- STATISTICHE -->
         <div class="profile-stats">
             <div class="stat-box">
                 <strong id="num-preferiti">0</strong>
@@ -57,8 +57,6 @@
                 <span>Commenti</span>
             </div>
         </div>
-        
-
     </section>
 
     <!-- TABS -->
@@ -69,29 +67,23 @@
     </div>
 
     <!-- CONTENUTI -->
-
-    <!-- PREFERITI -->
     <section id="preferiti" class="tab-content active">
-        <div class="movie-grid">
-            <!-- film preferiti caricati da preferiti.js -->
-        </div>
+        <div class="movie-grid"></div>
     </section>
 
-    <!-- WATCHLIST -->
     <section id="watchlist" class="tab-content">
-        <div class="movie-grid">
-            <!-- film watchlist caricati da watchlist.js -->
-        </div>
+        <div class="movie-grid"></div>
     </section>
 
-    <!-- COMMENTI -->
-    <section id="commenti" class="tab-content">
-        <!-- commenti caricati da commenti.js -->
-    </section>
+    <section id="commenti" class="tab-content"></section>
 
 </main>
 
-<!-- SCRIPT TABS -->
+<footer>
+    <p>&copy; 2026 - Popcorn&Pixels - Progetto Tecnologie Web</p>
+</footer>
+
+<!-- SCRIPT -->
 <script>
 const tabs = document.querySelectorAll('.tab');
 const contents = document.querySelectorAll('.tab-content');
@@ -107,7 +99,6 @@ tabs.forEach(tab => {
 });
 </script>
 
-<!-- SCRIPT APP -->
 <script src="utente.js"></script>
 <script src="preferiti.js"></script>
 <script src="watchlist.js"></script>

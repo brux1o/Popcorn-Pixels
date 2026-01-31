@@ -11,10 +11,16 @@ const userMenu = document.getElementById('userMenu');
 const statoUtente = document.getElementById("stato-utente");
 const nomeUtente = document.getElementById("nome-utente");
 
+const searchButton = document.getElementById('searchButton');
+
+searchButton.addEventListener('click', () => {
+    window.location.href = 'ricerca.php';
+});
+
 // chiamo il mio file php
 const response = await fetch('fetchMovies.php');
 const data = await response.json();
-
+ 
 // === AGGIUNTA: gestione stato login ===
 if (statoUtente && nomeUtente) {
     if (data.user) {
