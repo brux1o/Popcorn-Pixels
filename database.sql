@@ -1,16 +1,23 @@
-DROP TABLE IF EXISTS utente CASCADE;
+DROP TABLE IF EXISTS codici_backup CASCADE;
 
-CREATE TABLE utente (
+CREATE TABLE utenti (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     cognome VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL, 
     domanda_sicurezza VARCHAR(255) NOT NULL,
-    risposta_sicurezza VARCHAR(255) NOT NULL,
-    telegram_id VARCHAR(50),
-    data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    risposta_sicurezza VARCHAR(255) NOT NULL
+);
+
+DROP TABLE IF EXISTS utenti CASCADE;
+
+CREATE TABLE codici_backup (
+    id SERIAL PRIMARY KEY,
+    utente_id INTEGER REFERENCES utenti(id) ON DELETE CASCADE,
+    codice_hash VARCHAR(255) NOT NULL, 
+    usato BOOLEAN DEFAULT FALSE       
 );
 
 DROP TABLE IF EXISTS preferiti;

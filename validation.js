@@ -1,56 +1,56 @@
+
+// 1. Validazione LOGIN
 function validateLogin() {
-    let user = document.getElementById("login_username").value.trim();
-    let pass = document.getElementById("login_password").value;
+    const identificativo = document.getElementsByName('identificativo')[0].value.trim();
+    const password = document.getElementsByName('password')[0].value.trim();
 
-    if (user === "" && pass === "") {
-        alert("Inserisci sia username che password per accedere.");
-        return false;
-    }
-    if (user === "") {
-        alert("Il campo username non può essere vuoto.");
-        return false;
-    }
-    if (pass === "") {
-        alert("Inserisci la password.");
+    if (identificativo === "" || password === "") {
+        alert("Attenzione: Inserisci sia l'Username/Email che la Password.");
         return false;
     }
     return true;
 }
 
+// 2. Validazione REGISTRAZIONE
 function validateRegister() {
-    let user = document.getElementById("reg_username").value.trim();
-    let email = document.getElementById("reg_email").value.trim();
-    let pass = document.getElementById("reg_password").value;
-    let answer = document.getElementById("reg_answer").value.trim();
-
-    if (user.length < 3) {
-        alert("L'username deve contenere almeno 3 caratteri");
+    const nome = document.getElementsByName('nome')[0].value.trim();
+    const cognome = document.getElementsByName('cognome')[0].value.trim();
+    const email = document.getElementsByName('email')[0].value.trim();
+    const password = document.getElementsByName('password')[0].value;
+    
+    // Controllo Email (RegEx base)
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailReg.test(email)) {
+        alert("Inserisci un indirizzo Email valido.");
         return false;
     }
 
-    if (!email.includes("@")) {
-        alert("Inserisci un'email valida");
+    // Controllo Lunghezza Password
+    if (password.length < 6) {
+        alert("La password deve essere di almeno 6 caratteri.");
         return false;
     }
 
-    if (pass.length < 6) {
-        alert("La password deve contenere almeno 6 caratteri");
-        return false;
-    }
-
-    if (answer.length < 2) {
-        alert("La risposta alla domanda di sicurezza è troppo corta");
+    if (nome === "" || cognome === "") {
+        alert("Nome e Cognome sono obbligatori.");
         return false;
     }
 
     return true;
 }
 
+// 3. Validazione RESET FINALE
 function validateReset() {
-    let pass = document.getElementById("new_password").value;
+    const p1 = document.getElementsByName('n_password')[0].value;
+    const p2 = document.getElementsByName('c_password')[0].value;
 
-    if (pass.length < 6) {
-        alert("La nuova password deve contenere almeno 6 caratteri");
+    if (p1.length < 6) {
+        alert("La nuova password deve avere almeno 6 caratteri.");
+        return false;
+    }
+
+    if (p1 !== p2) {
+        alert("Le password inserite non coincidono.");
         return false;
     }
     return true;

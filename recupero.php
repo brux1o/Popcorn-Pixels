@@ -1,70 +1,95 @@
 <?php
-include("header.php");
-include("db.php");
+session_start();
+require_once 'db.php';
 
-$step = 1;
+// Controllo di sicurezza: se l'utente non ha superato la fase 2, lo cacciamo
+if (!isset($_SESSION['autorizzato_reset']) || !isset($_SESSION['reset_user_id'])) {
+    header("Location: recupero.php");
+    exit();
+}
+
 $errore = "";
-$user_confermato = "";
-$domanda_testo = "";
+$successo = false;
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if (isset($_POST["verifica_user"])) {
-        $u = trim($_POST["username_input"]);
-        $stmt = $conn->prepare("SELECT username, domanda FROM utenti WHERE username = :u");
-        $stmt->execute([':u' => $u]);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $pass1 = $_POST['n_password'] ?? '';
+    $pass2 = $_POST['c_password'] ?? '';
 
-        if ($res) {
-            $user_confermato = $res['username'];
-            $domanda_testo = $res['domanda'];
-            $step = 2;
-        } else { $errore = "Utente non trovato."; }
-    }
+    if ($pass1 !== $pass2) {
+        $errore = "Le password non coincidono.";
+    } elseif (strlen($pass1) < 6) {
+        $errore = "La password deve contenere almeno 6 caratteri.";
+    } else {
+        // Hash della nuova password
+        $password_hash = password_hash($pass1, PASSWORD_DEFAULT);
+        $user_id = $_SESSION['reset_user_id'];
 
-    if (isset($_POST["verifica_risp"])) {
-        $user_confermato = $_POST["user_hidden"];
-        $domanda_testo = $_POST["domanda_hidden"]; // Passata via hidden per non perderla
-        $risposta = trim($_POST["risposta_input"]);
+        // Aggiornamento sul database
+        $sql = "UPDATE utenti SET password = $1 WHERE id = $2";
+        $result = pg_query_params($db, $sql, array($password_hash, $user_id));
 
-        $stmt = $conn->prepare("SELECT risposta FROM utenti WHERE username = :u");
-        $stmt->execute([':u' => $user_confermato]);
-        $db_risp = $stmt->fetchColumn();
-
-        if ($db_risp === $risposta) {
-            $_SESSION['auth_reset'] = $user_confermato;
-            header("Location: reset_password.php");
-            exit;
+        if ($result) {
+            $successo = true;
+            // Puliamo la sessione per sicurezza: il processo è finito
+            session_destroy(); 
         } else {
-            $errore = "Risposta errata.";
-            $step = 2;
+            $errore = "Errore durante l'aggiornamento. Riprova.";
         }
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuova Password </title>
+    <link rel="stylesheet" href="stile/accesso.css">
+    <link rel="icon" type="image/png" href="sources/icona.png">
+    <script src="stile/validation.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-center"><img src="sources/icona.png" class="nav-logo"></div>
+            <div class="nav-right">
+                <a href="login.php" class="nav-button">Indietro</a>
+            </div>
+        </nav>
+    </header>
 
-<main class="page-wrapper">
-    <h1 class="page-title">Recupero</h1>
+    <main>
+    <div class="page-wrapper">
+        <h1 class="page-title">Nuova Password</h1>
+        
+        <?php if ($successo): ?>
+            <div style="text-align: center;">
+                <h2 class="page-subtitle" style="color: #4CAF50;">✅ Password aggiornata!</h2>
+                <p>Ora puoi tornare alla pagina di login e accedere con le tue nuove credenziali.</p>
+                <br>
+                <a href="login.php" class="nav-button">Torna al Login</a>
+            </div>
+        <?php else: ?>
+            <h2 class="page-subtitle">Inserisci le nuove credenziali</h2>
 
-    <?php if ($step == 1): ?>
-        <form method="POST">
-            <label>Inserisci Username</label>
-            <input type="text" name="username_input" required>
-            <button type="submit" name="verifica_user">Trova Account</button>
-        </form>
-    <?php else: ?>
-        <form method="POST">
-            <label>Username</label>
-            <input type="text" value="<?= htmlspecialchars($user_confermato) ?>" readonly style="background:#222; color:#888;">
-            <input type="hidden" name="user_hidden" value="<?= htmlspecialchars($user_confermato) ?>">
-            <input type="hidden" name="domanda_hidden" value="<?= htmlspecialchars($domanda_testo) ?>">
+            <?php if ($errore): ?>
+                <div class="alert alert-error" style="color: #ff4d4d; text-align: center; margin-bottom: 15px;">
+                    <?= htmlspecialchars($errore) ?>
+                </div>
+            <?php endif; ?>
 
-            <p style="margin: 20px 0; color: #d4a017;">Domanda: <strong><?= htmlspecialchars($domanda_testo) ?></strong></p>
+            <form action="reset_finale.php" method="POST" onsubmit="return validateReset()">
+                <label>Nuova Password</label>
+                <input type="password" name="n_password" required placeholder="Minimo 6 caratteri">
 
-            <label>Risposta</label>
-            <input type="text" name="risposta_input" required autofocus>
-            <button type="submit" name="verifica_risp">Verifica</button>
-        </form>
-    <?php endif; ?>
+                <label>Conferma Nuova Password</label>
+                <input type="password" name="c_password" required>
+
+                <button type="submit">Aggiorna Password</button>
+            </form>
+        <?php endif; ?>
+    </div>
 </main>
+</body>
+</html>
 
 <?php include("footer.php"); ?>

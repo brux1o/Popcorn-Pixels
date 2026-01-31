@@ -1,4 +1,4 @@
-/* ======== RESET E STRUTTURA ======== */
+/* ======== RESET E STRUTTURA BASE ======== */
 * { 
     margin: 0; 
     padding: 0; 
@@ -6,33 +6,58 @@
 }
 
 html, body {
-    height: 100%;
+    height: 100%; /* Importante per far toccare il fondo al footer */
     width: 100%;
     overflow-x: hidden;
 }
 
 body {
-    /* Sfondo statico senza keyframes */
     background: #1a1a1a;
-    background: linear-gradient(120deg, #1a1a1a, #222222, #1a1a1a);
+    background: radial-gradient(circle at center, #222222 0%, #1a1a1a 100%);
     color: #e8e8e8;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
     display: flex;
-    flex-direction: column; /* Header -> Main -> Footer */
+    flex-direction: column; 
+    min-height: 100vh;
 }
 
-/* ======== NAVBAR ======== */
+/* ======== NAVBAR (3 ZONE BILANCIATE) ======== */
 header { 
     flex: 0 0 auto; 
     width: 100%; 
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(212, 160, 23, 0.2);
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
-    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ogni zona occupa 1/3 dello spazio per centrare il logo matematicamente */
+.nav-left, .nav-right {
+    flex: 1; 
+    display: flex;
+}
+
+.nav-right {
+    justify-content: flex-end;
+}
+
+.nav-center {
+    flex: 0 0 auto; /* Il logo prende solo lo spazio necessario */
+    display: flex;
+    justify-content: center;
+}
+
+.nav-logo {
+    height: 60px; /* Logo popcorn leggermente più grande e visibile */
+    width: auto;
+    object-fit: contain;
 }
 
 .nav-button {
@@ -40,23 +65,23 @@ header {
     text-decoration: none;
     font-weight: bold;
     font-size: 14px;
-    padding: 8px 20px;
-    border: 1px solid rgba(212, 160, 23, 0.4);
+    padding: 8px 22px;
+    border: 1px solid rgba(212, 160, 23, 0.5);
     border-radius: 25px;
-    transition: 0.3s;
+    transition: all 0.3s ease;
 }
 
 .nav-button:hover {
     color: #fff;
     border-color: #fff;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(212, 160, 23, 0.1);
+    box-shadow: 0 0 10px rgba(212, 160, 23, 0.3);
 }
 
-/* ======== CENTRATURA CONTENUTO ======== */
+/* ======== CONTENUTO CENTRALE (MAIN) ======== */
 main {
     flex: 1 0 auto; 
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 40px 20px;
@@ -65,32 +90,32 @@ main {
 .page-wrapper {
     width: 100%;
     max-width: 450px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-/* ======== FORM E TITOLI ======== */
+/* ======== TITOLI ======== */
 .page-title {
     color: #d4a017;
-    font-size: 32px;
+    font-size: 36px;
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-align: center;
+    letter-spacing: 2px;
 }
 
 .page-subtitle {
     color: #888;
+    font-size: 16px;
     margin-bottom: 30px;
     text-align: center;
 }
 
+/* ======== FORM E INPUT ======== */
 form {
     background: #262626;
     padding: 35px;
     border-radius: 15px;
     border: 1px solid #333;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.7);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     width: 100%;
 }
 
@@ -105,47 +130,89 @@ form {
 label { 
     color: #d4a017; 
     display: block; 
-    margin-bottom: 5px; 
+    margin-bottom: 8px; 
     font-size: 13px; 
-    font-weight: bold; 
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 input, select {
     width: 100%;
-    padding: 12px;
+    padding: 12px 15px;
     background: #1e1e1e;
     border: 1px solid #444;
     color: white;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.3s;
 }
 
-/* ======== BOTTONE INVIO ======== */
+input:focus, select:focus {
+    border-color: #d4a017;
+}
+
+/* ======== BOTTONE AZIONE ======== */
 button {
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     background: #d4a017;
     color: #1a1a1a;
     border: none;
     border-radius: 10px;
-    font-weight: bold;
-    font-size: 18px;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.4s;
 }
 
 button:hover {
-    background: #b88a12;
-    color: #fff; /* Scritta bianca come richiesto */
-    transform: translateY(-2px);
+    background: #f1c40f; /* Un oro più acceso al passaggio */
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* ======== ALERT MESSAGGI ======== */
+.alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid;
+}
+
+.alert-error {
+    background: rgba(255, 77, 77, 0.1);
+    border-color: #ff4d4d;
+    color: #ff4d4d;
 }
 
 /* ======== FOOTER ======== */
 footer {
-    flex: 0 0 auto;
-    padding: 20px;
+    padding: 25px;
     text-align: center;
-    background: rgba(0,0,0,0.4);
-    color: #555;
-    font-size: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #666;
+    font-size: 13px;
+    border-top: 1px solid #222;
+}
+
+.form-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}
+
+.form-footer a {
+    color: #d4a017;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
 }
