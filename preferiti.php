@@ -4,12 +4,12 @@ require_once __DIR__ . '/database.php';
 session_start();
 header('Content-Type: application/json'); 
 
-if (!isset($_SESSION['utente_id'])) {
+if (!isset($_SESSION['username'])) {
     echo json_encode(['success' => false, 'message' => 'Devi essere loggato per eseguire questa azione.']);
     exit;
 }
 
-$userId = $_SESSION['utente_id'];
+$userId = $_SESSION['username'];
 
 $contentId = $_POST['id'] ?? null;
 $contentType = $_POST['type'] ?? null;
@@ -46,7 +46,7 @@ if ($action === 'scambio') {
         exit;
     }
 
-    $query_insert = "INSERT INTO preferiti (user_id, content_id, tipo_content, titolo, poster_path) 
+    $query_insert = "INSERT INTO preferiti (username, content_id, tipo_content, titolo, poster_path) 
                      VALUES ($1, $2, $3, $4, $5)";
     
     $stmt_ins = pg_prepare($db, "insert_swap", $query_insert);
@@ -71,7 +71,7 @@ $num_preferiti = pg_fetch_result($result_count, 0, 0);
 
 if ($num_preferiti < 5) {
 
-    $query_insert = "INSERT INTO preferiti (user_id, content_id, tipo_content, titolo, poster_path) 
+    $query_insert = "INSERT INTO preferiti (username, content_id, tipo_content, titolo, poster_path) 
                      VALUES ($1, $2, $3, $4, $5)";
                      
     $stmt_ins = pg_prepare($db, "insert_fav", $query_insert);
