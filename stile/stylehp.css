@@ -8,23 +8,38 @@ html, body {
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 15px 20px;
   background-color: #3A3B3D;
   border-bottom: 2px solid #5A5B5E;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-.title-container h1 {
-  font-size: 2.5em; 
+.title-container {
+   flex: 1;
   text-align: center;
+}
+.title-container h1 {
+  font-size: 2.5em;
+  margin: 0;
   text-shadow: 2px 2px 4px #000;
-  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+
+#zona-utente {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .title-container h1:hover {
   transform: scale(1.05); /* Ingrandisce il titolo quando hover */
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
 }
 
 .button-container button {
@@ -219,3 +234,13 @@ h2:hover {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
+/* === STATO UTENTE === */
+#stato-utente.online {
+  color: green;
+  font-weight: bold;
+}
+
+#stato-utente.offline {
+  color: red;
+  font-weight: bold;
+} 

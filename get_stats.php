@@ -6,11 +6,11 @@ session_start();
 require 'db.php';
 
 /* controllo login */
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['username'])) {
     exit();
 }
 
-$idutente = $_SESSION['user_id'];
+$idutente = $_SESSION['username'];
 
 /* ===== CONTA PREFERITI ===== */
 $sql_preferiti = "
