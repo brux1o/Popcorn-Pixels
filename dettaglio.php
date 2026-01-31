@@ -1,14 +1,14 @@
 <?php
-    require_once __DIR__ .'/db.php';
+    require_once '/db.php';
     
-    // Avvio sessione se non attiva
+   
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    require_once __DIR__ . '/aggiornamentoStato.php';
+    require_once '/aggiornamentoStato.php';
 
-    $logger = isset($_SESSION['utente_id']);
+    $logger = isset($_SESSION['username']);
     $idContent = isset($_GET['id']) ? $_GET['id'] : '';
     $typeContent = isset($_GET['type']) ? $_GET['type'] : 'movie';
 
@@ -167,6 +167,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="resources/icona.png">
     <title><?php echo $titolo; ?> - Dettagli</title>
     <link rel="stylesheet" href="dettaglio_css.css">
 </head>
@@ -175,7 +176,7 @@
     <header>
         <div id="nav-sinistra">
             <a href="javascript:history.back()" class="tasto-tondo" id="btn-back">
-                <img src="back.png" alt="Torna alla ricerca">
+                ←
             </a>
         </div>
 
@@ -215,6 +216,8 @@
             <?php endif; ?>
         </div>  
     </header>
+
+    <main>
 
     <div class="main-wrapper">
         
@@ -305,8 +308,8 @@
     </div>
 
     <div class="comment-form-container">
-        <?php if(isset($_SESSION['utente_id'])): ?>
-            <form action="../backend/salva_commento.php" method="POST" class="comment-form">
+        <?php if(isset($_SESSION['username'])): ?>
+            <form action="/salva_commento.php" method="POST" class="comment-form">
                 <input type="hidden" name="id_contenuto" value="<?php echo $idContent; ?>">
                 <input type="hidden" name="tipo" value="<?php echo $typeContent; ?>">
                 
@@ -341,6 +344,12 @@
             <?php endif; ?>
         </div>
     </div>
+
+    </main>
+
+    <footer>
+        <? include '/footer.php'; ?>
+    </footer>
 
     <?php include 'aggiungiPreferiti.php'; ?>
     <?php include 'aggiungiWatchlist.php'; ?>

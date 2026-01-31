@@ -4,10 +4,10 @@ session_start();
 
 require 'db.php';
 
-if(!isset($_SESSION['user_id'])){
+if(!isset($_SESSION['username'])){
     exit();
 }
-$idutente=$_SESSION['user_id'];
+$idutente=$_SESSION['username'];
 
 $sql="
     SELECT id,id_contenuto,titolo,tipo_contenuto,testo,data_inserimento

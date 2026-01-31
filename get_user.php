@@ -7,11 +7,11 @@ session_start();
 //connessione al database 
 require 'db.php';
 //controllo il login
-if(!isset($_SESSION['user_id']))
+if(!isset($_SESSION['username']))
     {
        exit;
     }
-$idutente=$_SESSION['user_id'];
+$idutente=$_SESSION['username'];
 
 $sql = "
     SELECT  nome, cognome, email, username
