@@ -16,7 +16,6 @@ CREATE TABLE utente (
     password VARCHAR(255) NOT NULL, 
     domanda_sicurezza VARCHAR(255) NOT NULL,
     risposta_sicurezza VARCHAR(255) NOT NULL,
-    data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. TABELLA CODICI BACKUP
