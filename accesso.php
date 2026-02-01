@@ -4,6 +4,7 @@ session_start();
 // --- 1. CONFIGURAZIONE DATABASE ---
 require_once 'db.php'; 
 
+
 // --- 2. GESTIONE MESSAGGI ---
 $error_msg = "";
 $success_msg = "";
@@ -35,7 +36,7 @@ if (isset($_POST['btn_register'])) {
         $error_msg = "La password deve essere almeno di 8 caratteri.";
     } else {
         $check_query = "SELECT id FROM utente WHERE email=$1 OR username=$2";
-        $res_check = pg_query_params($conn, $check_query, array($email_val, $username_val));
+        $res_check = pg_query_params($db, $check_query, array($email_val, $username_val));
 
         if (pg_num_rows($res_check) > 0) {
             $error_msg = "Username o Email già presenti nel sistema.";
@@ -44,7 +45,7 @@ if (isset($_POST['btn_register'])) {
             $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
             
             $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza) VALUES ($1,$2,$3,$4,$5,$6,$7)";
-            $res_ins = pg_query_params($conn, $insert_query, array($nome_val, $cognome_val, $email_val, $username_val, $pass_hash, $domanda_val, $risp_hash));
+            $res_ins = pg_query_params($db, $insert_query, array($nome_val, $cognome_val, $email_val, $username_val, $pass_hash, $domanda_val, $risp_hash));
             
             if ($res_ins) {
                 $success_msg = "Registrazione completata! Ora puoi accedere.";
@@ -66,7 +67,7 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
         $error_msg = "Inserisci username/email e password.";
     } else {
         $login_query = "SELECT * FROM utente WHERE username=$1 OR email=$1";
-        $res_login = pg_query_params($conn, $login_query, array($login_input_val));
+        $res_login = pg_query_params($db, $login_query, array($login_input_val));
         $user_row = pg_fetch_assoc($res_login);
         
         // Se la password è corretta...
@@ -78,7 +79,7 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
             $_SESSION['logged_in'] = true;
             
             // ... TI MANDA QUI:
-            header("Location: paginapersona.html");
+            header("Location: paginapersonale.html");
             exit;
         } else {
             $error_msg = "Credenziali non corrette.";
