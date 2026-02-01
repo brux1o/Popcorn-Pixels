@@ -1,0 +1,613 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict zfCpkbeoF1UhmF1DnHYzG9bW62qnEVNc5gAh4G4SuaYhti2tjTBHbdBfUpjzjy2
+
+-- Dumped from database version 18.1
+-- Dumped by pg_dump version 18.1
+
+-- Started on 2026-02-01 23:12:04
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 222 (class 1259 OID 17266)
+-- Name: codici_backup; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.codici_backup (
+    id integer NOT NULL,
+    utente_id integer,
+    codice_hash character varying(255) NOT NULL,
+    usato boolean DEFAULT false
+);
+
+
+ALTER TABLE public.codici_backup OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 17265)
+-- Name: codici_backup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.codici_backup_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.codici_backup_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5074 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: codici_backup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.codici_backup_id_seq OWNED BY public.codici_backup.id;
+
+
+--
+-- TOC entry 228 (class 1259 OID 17327)
+-- Name: commenti; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.commenti (
+    id integer NOT NULL,
+    id_utente integer NOT NULL,
+    id_contenuto integer NOT NULL,
+    tipo_contenuto character varying(10),
+    titolo character varying(255) NOT NULL,
+    testo text NOT NULL,
+    data_inserimento timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT commenti_tipo_contenuto_check CHECK (((tipo_contenuto)::text = ANY ((ARRAY['movie'::character varying, 'tv'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.commenti OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 17326)
+-- Name: commenti_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.commenti_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.commenti_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5077 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: commenti_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.commenti_id_seq OWNED BY public.commenti.id;
+
+
+--
+-- TOC entry 224 (class 1259 OID 17281)
+-- Name: preferiti; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.preferiti (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    content_id integer NOT NULL,
+    tipo_content character varying(20) NOT NULL,
+    titolo character varying(255) NOT NULL,
+    poster_path character varying(255),
+    data_aggiunta timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT preferiti_tipo_content_check CHECK (((tipo_content)::text = ANY ((ARRAY['movie'::character varying, 'tv'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.preferiti OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 17280)
+-- Name: preferiti_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.preferiti_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.preferiti_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5080 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: preferiti_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.preferiti_id_seq OWNED BY public.preferiti.id;
+
+
+--
+-- TOC entry 220 (class 1259 OID 17244)
+-- Name: utente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.utente (
+    id integer NOT NULL,
+    nome character varying(50) NOT NULL,
+    cognome character varying(50) NOT NULL,
+    email character varying(100) NOT NULL,
+    username character varying(50) NOT NULL,
+    password character varying(255) NOT NULL,
+    domanda_sicurezza character varying(255) NOT NULL,
+    risposta_sicurezza character varying(255) NOT NULL,
+    immagine_profilo character varying(255) DEFAULT 'resources/utente.png'::character varying
+);
+
+
+ALTER TABLE public.utente OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 17243)
+-- Name: utente_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.utente_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.utente_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5083 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: utente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.utente_id_seq OWNED BY public.utente.id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 17304)
+-- Name: watchlist; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.watchlist (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    content_id integer NOT NULL,
+    tipo_content character varying(20) NOT NULL,
+    titolo character varying(255) NOT NULL,
+    poster_path character varying(255),
+    data_aggiunta timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT watchlist_tipo_content_check CHECK (((tipo_content)::text = ANY ((ARRAY['movie'::character varying, 'tv'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.watchlist OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 17303)
+-- Name: watchlist_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.watchlist_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.watchlist_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5086 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: watchlist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.watchlist_id_seq OWNED BY public.watchlist.id;
+
+
+--
+-- TOC entry 4878 (class 2604 OID 17269)
+-- Name: codici_backup id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.codici_backup ALTER COLUMN id SET DEFAULT nextval('public.codici_backup_id_seq'::regclass);
+
+
+--
+-- TOC entry 4884 (class 2604 OID 17330)
+-- Name: commenti id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.commenti ALTER COLUMN id SET DEFAULT nextval('public.commenti_id_seq'::regclass);
+
+
+--
+-- TOC entry 4880 (class 2604 OID 17284)
+-- Name: preferiti id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.preferiti ALTER COLUMN id SET DEFAULT nextval('public.preferiti_id_seq'::regclass);
+
+
+--
+-- TOC entry 4876 (class 2604 OID 17247)
+-- Name: utente id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente ALTER COLUMN id SET DEFAULT nextval('public.utente_id_seq'::regclass);
+
+
+--
+-- TOC entry 4882 (class 2604 OID 17307)
+-- Name: watchlist id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.watchlist ALTER COLUMN id SET DEFAULT nextval('public.watchlist_id_seq'::regclass);
+
+
+--
+-- TOC entry 5061 (class 0 OID 17266)
+-- Dependencies: 222
+-- Data for Name: codici_backup; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.codici_backup (id, utente_id, codice_hash, usato) FROM stdin;
+2	1	$2y$10$toec4RqZNndRThznqOKtAu1fRSxyBo2Hk6wlwODsWJfP27avxfjQ6	f
+3	1	$2y$10$Z6zjlc6t54Gn43HxmD45u.1eR/DFHj0jivROW6ZVJpVQIcXypPaRO	f
+1	1	$2y$10$ICAMcO3.SNkZ83NhKG3tvO.xL8VICr4xN0Mi350F2duAiuVI.NjJm	t
+\.
+
+
+--
+-- TOC entry 5067 (class 0 OID 17327)
+-- Dependencies: 228
+-- Data for Name: commenti; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.commenti (id, id_utente, id_contenuto, tipo_contenuto, titolo, testo, data_inserimento) FROM stdin;
+1	1	1234731	movie	Anaconda	Bellissimo, accattivante e coinvolgente!!	2026-02-01 22:57:21.276549
+2	1	1168190	movie	Fratelli demolitori	Commento prova1	2026-02-01 23:08:10.690078
+3	1	1168190	movie	Fratelli demolitori	Commento prova1	2026-02-01 23:08:16.673128
+4	1	840464	movie	Greenland 2: Migration	Commento prova 2	2026-02-01 23:08:59.761371
+5	1	1306368	movie	The Rip - Soldi sporchi	Commento prova 3	2026-02-01 23:09:18.608075
+\.
+
+
+--
+-- TOC entry 5063 (class 0 OID 17281)
+-- Dependencies: 224
+-- Data for Name: preferiti; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.preferiti (id, user_id, content_id, tipo_content, titolo, poster_path, data_aggiunta) FROM stdin;
+1	1	1168190	movie	Fratelli demolitori	/24lKLBFQ7AMVb8CClWoDOZ2R8qo.jpg	2026-02-01 22:55:18.67732
+2	1	840464	movie	Greenland 2: Migration	/7xkwTQZiCIVH15nbtxo8bCEW8jw.jpg	2026-02-01 22:55:24.213383
+3	1	1419406	movie	The Shadow's Edge	/25OeH0GOuEljJqZoF0HoKxOpq0B.jpg	2026-02-01 22:55:30.587343
+4	1	1234731	movie	Anaconda	/qp8JklgbpFFXmKZv78kde1duVO2.jpg	2026-02-01 22:55:36.747127
+5	1	1271895	movie	96分鐘	/5HefFZDvzHAR4qWEMExLfyM0qLs.jpg	2026-02-01 22:55:42.457667
+\.
+
+
+--
+-- TOC entry 5059 (class 0 OID 17244)
+-- Dependencies: 220
+-- Data for Name: utente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.utente (id, nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) FROM stdin;
+1	Bruno	Oliva	b.oliva7@studenti.unisa.it	bruno	$2y$10$jDNfI9TXizb4p2SrfKG0d.qqAJdOQnqClf9aKQpjWzKMUlu9R1BA6	animale	$2y$10$q6OC9oNIoybbkoYCV/545e3.avOY/mxG1BXHbtjPq4QC2hzluDluO	resources/utente.png
+\.
+
+
+--
+-- TOC entry 5065 (class 0 OID 17304)
+-- Dependencies: 226
+-- Data for Name: watchlist; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.watchlist (id, user_id, content_id, tipo_content, titolo, poster_path, data_aggiunta) FROM stdin;
+1	1	66732	tv	Stranger Things	/wZNIKNMqjulcU1AbU6X98tHy9QF.jpg	2026-02-01 22:55:50.313688
+2	1	1622	tv	Supernatural	/u40gJarLPlIkwouKlzGdobQOV9k.jpg	2026-02-01 22:55:56.514772
+3	1	456	tv	I Simpson	/fxLooktejTUqCvZl9ARhKMFNpbf.jpg	2026-02-01 22:56:01.981279
+4	1	91239	tv	Bridgerton	/5HeazAYMGBgRWa27ViNS6GfdriR.jpg	2026-02-01 22:56:11.143105
+6	1	1408	tv	Dr. House - Medical Division	/3Cz7ySOQJmqiuTdrc6CY0r65yDI.jpg	2026-02-01 22:56:36.700794
+\.
+
+
+--
+-- TOC entry 5088 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: codici_backup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.codici_backup_id_seq', 3, true);
+
+
+--
+-- TOC entry 5089 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: commenti_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.commenti_id_seq', 5, true);
+
+
+--
+-- TOC entry 5090 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: preferiti_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.preferiti_id_seq', 5, true);
+
+
+--
+-- TOC entry 5091 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: utente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.utente_id_seq', 1, true);
+
+
+--
+-- TOC entry 5092 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: watchlist_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.watchlist_id_seq', 6, true);
+
+
+--
+-- TOC entry 4896 (class 2606 OID 17274)
+-- Name: codici_backup codici_backup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.codici_backup
+    ADD CONSTRAINT codici_backup_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4906 (class 2606 OID 17341)
+-- Name: commenti commenti_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.commenti
+    ADD CONSTRAINT commenti_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4898 (class 2606 OID 17295)
+-- Name: preferiti preferiti_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.preferiti
+    ADD CONSTRAINT preferiti_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4900 (class 2606 OID 17297)
+-- Name: preferiti preferiti_user_id_content_id_tipo_content_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.preferiti
+    ADD CONSTRAINT preferiti_user_id_content_id_tipo_content_key UNIQUE (user_id, content_id, tipo_content);
+
+
+--
+-- TOC entry 4890 (class 2606 OID 17262)
+-- Name: utente utente_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT utente_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4892 (class 2606 OID 17260)
+-- Name: utente utente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT utente_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4894 (class 2606 OID 17264)
+-- Name: utente utente_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.utente
+    ADD CONSTRAINT utente_username_key UNIQUE (username);
+
+
+--
+-- TOC entry 4902 (class 2606 OID 17318)
+-- Name: watchlist watchlist_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.watchlist
+    ADD CONSTRAINT watchlist_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4904 (class 2606 OID 17320)
+-- Name: watchlist watchlist_user_id_content_id_tipo_content_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.watchlist
+    ADD CONSTRAINT watchlist_user_id_content_id_tipo_content_key UNIQUE (user_id, content_id, tipo_content);
+
+
+--
+-- TOC entry 4907 (class 2606 OID 17275)
+-- Name: codici_backup codici_backup_utente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.codici_backup
+    ADD CONSTRAINT codici_backup_utente_id_fkey FOREIGN KEY (utente_id) REFERENCES public.utente(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4910 (class 2606 OID 17342)
+-- Name: commenti fk_utente; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.commenti
+    ADD CONSTRAINT fk_utente FOREIGN KEY (id_utente) REFERENCES public.utente(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4908 (class 2606 OID 17298)
+-- Name: preferiti preferiti_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.preferiti
+    ADD CONSTRAINT preferiti_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.utente(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4909 (class 2606 OID 17321)
+-- Name: watchlist watchlist_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.watchlist
+    ADD CONSTRAINT watchlist_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.utente(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 5073 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: TABLE codici_backup; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.codici_backup TO www;
+
+
+--
+-- TOC entry 5075 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: SEQUENCE codici_backup_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.codici_backup_id_seq TO www;
+
+
+--
+-- TOC entry 5076 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: TABLE commenti; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.commenti TO www;
+
+
+--
+-- TOC entry 5078 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: SEQUENCE commenti_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.commenti_id_seq TO www;
+
+
+--
+-- TOC entry 5079 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: TABLE preferiti; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.preferiti TO www;
+
+
+--
+-- TOC entry 5081 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: SEQUENCE preferiti_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.preferiti_id_seq TO www;
+
+
+--
+-- TOC entry 5082 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: TABLE utente; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.utente TO www;
+
+
+--
+-- TOC entry 5084 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: SEQUENCE utente_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.utente_id_seq TO www;
+
+
+--
+-- TOC entry 5085 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: TABLE watchlist; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.watchlist TO www;
+
+
+--
+-- TOC entry 5087 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: SEQUENCE watchlist_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.watchlist_id_seq TO www;
+
+
+-- Completed on 2026-02-01 23:12:05
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict zfCpkbeoF1UhmF1DnHYzG9bW62qnEVNc5gAh4G4SuaYhti2tjTBHbdBfUpjzjy2
+
