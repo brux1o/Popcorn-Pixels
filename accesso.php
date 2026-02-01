@@ -1,13 +1,25 @@
 <?php
+// --- ABILITA VISUALIZZAZIONE ERRORI ---
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
 // --- 1. CONFIGURAZIONE DATABASE ---
 require_once 'db.php'; 
 
+// FIX DATABASE: Collega $db a $conn
+if (isset($db)) {
+    $conn = $db;
+} elseif (!isset($conn)) {
+    die("Errore Critico: Nessuna variabile di connessione (\$db o \$conn) trovata in db.php");
+}
 
 // --- 2. GESTIONE MESSAGGI ---
 $error_msg = "";
 $success_msg = "";
+
 if (isset($_SESSION['msg_flash'])) {
     $success_msg = $_SESSION['msg_flash'];
     unset($_SESSION['msg_flash']); 
@@ -22,6 +34,7 @@ $show_register = false;
 if (isset($_POST['btn_register'])) {
     $show_register = true; 
     
+    // Raccolta dati
     $nome_val = htmlspecialchars(trim($_POST['reg_nome']));
     $cognome_val = htmlspecialchars(trim($_POST['reg_cognome']));
     $email_val = trim($_POST['reg_email']);
@@ -30,36 +43,84 @@ if (isset($_POST['btn_register'])) {
     $domanda_val = $_POST['reg_domanda'];
     $risposta = trim($_POST['reg_risposta']);
 
-    if (empty($nome_val) || empty($cognome_val) || empty($email_val) || empty($username_val) || empty($password) || empty($risposta)) {
-        $error_msg = "Compila tutti i campi obbligatori.";
-    } elseif (strlen($password) < 8) {
-        $error_msg = "La password deve essere almeno di 8 caratteri.";
-    } else {
-        $check_query = "SELECT id FROM utente WHERE email=$1 OR username=$2";
-        $res_check = pg_query_params($db, $check_query, array($email_val, $username_val));
-
-        if (pg_num_rows($res_check) > 0) {
-            $error_msg = "Username o Email già presenti nel sistema.";
-        } else {
-            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
-            $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
+    // --- GESTIONE CARICAMENTO FOTO (PER VARCHAR) ---
+    // Valore di default come da tuo SQL
+    $percorso_immagine = 'resources/utente.png'; 
+    
+    // Se l'utente ha caricato un file valido
+    if (isset($_FILES['reg_foto']) && $_FILES['reg_foto']['error'] === 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $filename = $_FILES['reg_foto']['name'];
+        $filetype = $_FILES['reg_foto']['type'];
+        $filesize = $_FILES['reg_foto']['size'];
+        
+        // Estensione del file
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        
+        if (in_array($ext, $allowed)) {
+            // Creiamo un nome unico per evitare sovrascritture
+            $new_filename = uniqid() . "_" . $username_val . "." . $ext;
+            $upload_path = "uploads/" . $new_filename;
             
-            $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza) VALUES ($1,$2,$3,$4,$5,$6,$7)";
-            $res_ins = pg_query_params($db, $insert_query, array($nome_val, $cognome_val, $email_val, $username_val, $pass_hash, $domanda_val, $risp_hash));
-            
-            if ($res_ins) {
-                $success_msg = "Registrazione completata! Ora puoi accedere.";
-                $show_register = false; 
-                $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
+            // Spostiamo il file dalla temp alla cartella uploads
+            if (move_uploaded_file($_FILES['reg_foto']['tmp_name'], $upload_path)) {
+                $percorso_immagine = $upload_path; // Questo andrà nel DB
             } else {
-                $error_msg = "Errore durante la registrazione.";
+                $error_msg = "Errore nel salvataggio dell'immagine sul server.";
+            }
+        } else {
+            $error_msg = "Formato immagine non valido. Usa JPG, PNG o GIF.";
+        }
+    }
+
+    // --- VALIDAZIONE ---
+    // Procediamo solo se non ci sono stati errori col file
+    if (empty($error_msg)) {
+        if (empty($nome_val) || empty($cognome_val) || empty($email_val) || empty($username_val) || empty($password) || empty($risposta)) {
+            $error_msg = "Compila tutti i campi obbligatori.";
+        } elseif (strlen($password) < 8) {
+            $error_msg = "La password deve essere almeno di 8 caratteri.";
+        } else {
+            // Controllo esistenza utente
+            $check_query = "SELECT id FROM utente WHERE email=$1 OR username=$2";
+            $res_check = pg_query_params($conn, $check_query, array($email_val, $username_val));
+
+            if (pg_num_rows($res_check) > 0) {
+                $error_msg = "Username o Email già presenti nel sistema.";
+            } else {
+                // Hashing
+                $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+                $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
+                
+                // --- QUERY DI INSERIMENTO (AGGIORNATA PER IL TUO DB) ---
+                // La colonna è 'immagine_profilo'
+                $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)";
+                
+                $res_ins = pg_query_params($conn, $insert_query, array(
+                    $nome_val, 
+                    $cognome_val, 
+                    $email_val, 
+                    $username_val, 
+                    $pass_hash, 
+                    $domanda_val, 
+                    $risp_hash, 
+                    $percorso_immagine // Qui passiamo la stringa del percorso (es. 'uploads/foto.jpg')
+                ));
+                
+                if ($res_ins) {
+                    $success_msg = "Registrazione completata! Ora puoi accedere.";
+                    $show_register = false; 
+                    $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
+                } else {
+                    $error_msg = "Errore database: " . pg_last_error($conn);
+                }
             }
         }
     }
 }
 
-// --- 5. LOGIN (QUI AVVIENE IL "COLLEGAMENTO" DEL BOTTONE) ---
-if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'ACCEDI'
+// --- 5. LOGIN ---
+if (isset($_POST['btn_login'])) {
     $login_input_val = trim($_POST['login_input']);
     $password = $_POST['login_password'];
     
@@ -67,22 +128,25 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
         $error_msg = "Inserisci username/email e password.";
     } else {
         $login_query = "SELECT * FROM utente WHERE username=$1 OR email=$1";
-        $res_login = pg_query_params($db, $login_query, array($login_input_val));
-        $user_row = pg_fetch_assoc($res_login);
+        $res_login = pg_query_params($conn, $login_query, array($login_input_val));
         
-        // Se la password è corretta...
-        if ($user_row && password_verify($password, $user_row['password'])) {
-            session_regenerate_id(true);
-            $_SESSION['user_id'] = $user_row['id'];
-            $_SESSION['username'] = $user_row['username'];
-            $_SESSION['nome'] = $user_row['nome']; 
-            $_SESSION['logged_in'] = true;
-            
-            // ... TI MANDA QUI:
-            header("Location: paginapersonale.html");
-            exit;
+        if (!$res_login) {
+            $error_msg = "Errore tecnico Login: " . pg_last_error($conn);
         } else {
-            $error_msg = "Credenziali non corrette.";
+            $user_row = pg_fetch_assoc($res_login);
+            
+            if ($user_row && password_verify($password, $user_row['password'])) {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user_row['id'];
+                $_SESSION['username'] = $user_row['username'];
+                $_SESSION['nome'] = $user_row['nome']; 
+                $_SESSION['logged_in'] = true;
+                
+                header("Location: paginapersonale.html");
+                exit;
+            } else {
+                $error_msg = "Credenziali non corrette.";
+            }
         }
     }
 }
@@ -95,7 +159,6 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accedi - Popcorn&Pixels</title>
     <link rel="icon" type="image/png" href="resources/icona.png">
-    
     <link rel="stylesheet" href="stile/accesso.css">
     <script src="validation.js" defer></script>
 </head>
@@ -111,20 +174,16 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
 
     <main class="main-container auth-page">
 
-    <?php if($error_msg): ?>
-        <div class="alert error" style="max-width: 600px; margin: 0 auto 20px auto;">
-            <?= $error_msg; ?>
-        </div>
-    <?php endif; ?>
-    
-    <?php if($success_msg): ?>
-        <div class="alert success" style="max-width: 600px; margin: 0 auto 20px auto;">
-            <?= $success_msg; ?>
-        </div>
-    <?php endif; ?>
-
     <div class="auth-wrapper">
         
+        <?php if($error_msg): ?>
+            <div class="alert error"><?= $error_msg; ?></div>
+        <?php endif; ?>
+        
+        <?php if($success_msg): ?>
+            <div class="alert success"><?= $success_msg; ?></div>
+        <?php endif; ?>
+
         <div id="box-login" style="display: <?php echo $show_register ? 'none' : 'block'; ?>;">
             <h2 class="titolo-fuori">BENTORNATO</h2>
             <p class="form-subtitle">Accedi al tuo account</p>
@@ -154,7 +213,7 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
             <p class="form-subtitle">Crea il tuo profilo personale</p>
             
             <div class="form-card">
-                <form action="accesso.php" method="POST" onsubmit="return validateRegister()">
+                <form action="accesso.php" method="POST" enctype="multipart/form-data" onsubmit="return validateRegister()">
                     
                     <div class="input-row">
                         <div>
@@ -197,6 +256,9 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
                         </div>
                     </div>
 
+                    <label style="margin-top: 15px;">Foto Profilo (Opzionale)</label>
+                    <input type="file" name="reg_foto" accept="image/*" style="padding: 10px; background: #48494B; border-radius: 10px;">
+
                     <button type="submit" name="btn_register">REGISTRATI</button>
                 </form>
                 <p class="switch-text">
@@ -204,7 +266,7 @@ if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'A
                 </p>
             </div>
         </div>
-    </div>
+    </div> 
 
     <script>
         function mostraRegistrazione() {
