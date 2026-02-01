@@ -56,7 +56,7 @@
                     </div>
                     
                 <?php else: ?>
-                    <a href="login.php" class="tasto-tondo"> 
+                    <a href="accesso.php" class="tasto-tondo"> 
                         <img src="resources/utente.png" alt="Login">
                     </a>
                 <?php endif; ?>
