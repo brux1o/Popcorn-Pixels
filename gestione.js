@@ -89,7 +89,7 @@ registerButton.addEventListener('click', (e) => {
         `;
     } else {
         userMenu.innerHTML = `
-            <a href="login.php">Accedi</a>
+            <a href="accesso.php">Accedi</a>
         `;
     }
     userMenu.classList.toggle('hidden');
