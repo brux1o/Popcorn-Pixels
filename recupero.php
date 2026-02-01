@@ -6,6 +6,23 @@ error_reporting(E_ALL);
 
 session_start();
 
+// --- 0. LOGICA DI PULIZIA SESSIONE (NUOVO) ---
+// Se l'utente clicca sulla freccia indietro o sul logo, riceveremo ?exit=...
+// Questo serve a cancellare i progressi quando si esce dalla pagina.
+if (isset($_GET['exit'])) {
+    unset($_SESSION['rec_id']);
+    unset($_SESSION['rec_domanda']);
+    unset($_SESSION['rec_step']);
+    
+    // Reindirizza alla pagina giusta
+    if ($_GET['exit'] === 'home') {
+        header("Location: struttura.html");
+    } else {
+        header("Location: accesso.php");
+    }
+    exit;
+}
+
 // --- 1. CONFIGURAZIONE DATABASE ---
 require_once 'db.php'; 
 
@@ -178,10 +195,10 @@ if (isset($_POST['btn_reset'])) {
 <body>
 
     <header class="main-header">
-        <a href="accesso.php" class="back-arrow" onclick="confermaUscita(event)">&#8592;</a>
+        <a href="recupero.php?exit=login" class="back-arrow" onclick="confermaUscita(event)">&#8592;</a>
         
         <div class="logo-center">
-            <a href="struttura.html" class="tasto-tondo" style="text-decoration:none;">
+            <a href="recupero.php?exit=home" class="tasto-tondo" style="text-decoration:none;" onclick="confermaUscita(event)">
                 <img src="resources/icona.png" alt="Homepage">
             </a>
         </div>
@@ -189,7 +206,9 @@ if (isset($_POST['btn_reset'])) {
 
     <main class="main-container auth-page">
 
-    <div class="auth-wrapper" style="max-width: 500px;"> <?php if($error_msg): ?>
+    <div class="auth-wrapper" style="max-width: 500px;"> 
+        
+        <?php if($error_msg): ?>
             <div class="alert error"><?= $error_msg; ?></div>
         <?php endif; ?>
 
