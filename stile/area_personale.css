@@ -134,6 +134,8 @@ header {
 .profile-data p {
     font-size: 1.1rem;
     margin: 5px 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .username {
