@@ -38,21 +38,46 @@ h1, h2, h3, p, label, a {
     border-bottom: 2px solid #5A5B5E;
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     height: 80px;
-    position: relative;
+    position: relative; /* Fondamentale per posizionare la freccia */
     width: 100%;
     flex-shrink: 0;
 }
 
 /* STILE PER L'ICONA HEADER */
 .tasto-tondo img {
-    height: 60px; /* Dimensione fissa adatta all'header di 80px */
-    width: auto;  /* Mantiene le proporzioni */
-    display: block; /* Rimuove spazi bianchi indesiderati sotto */
+    height: 60px; 
+    width: auto;  
+    display: block; 
     transition: transform 0.3s ease;
 }
 
 .tasto-tondo:hover img {
-    transform: scale(1.1); /* Zoom leggero al passaggio del mouse */
+    transform: scale(1.1); 
+}
+
+/* --- NUOVO: FRECCIA INDIETRO (Per Recupero.php) --- */
+.back-arrow {
+    position: absolute;
+    left: 25px; /* Distanza sinistra */
+    top: 50%;
+    transform: translateY(-50%); /* Centratura verticale perfetta */
+    color: #FFD700;
+    font-size: 28px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.back-arrow:hover {
+    background-color: rgba(255, 215, 0, 0.1);
+    transform: translateY(-50%) scale(1.1);
+    color: #fff;
 }
 
 /* =====================================================
@@ -67,7 +92,7 @@ h1, h2, h3, p, label, a {
     width: 100%;
 }
 
-/* Wrapper che si adatta se c'è la registrazione (più larga) */
+/* Wrapper che si adatta se c'è la registrazione */
 .auth-wrapper {
     width: 100%;
     max-width: 600px; 
@@ -78,7 +103,7 @@ h1, h2, h3, p, label, a {
    4. CARD E TITOLI
 ===================================================== */
 
-/* Titolo FUORI dal box (Giallo e Grande) */
+/* Titolo FUORI dal box */
 .titolo-fuori {
     text-align: center;
     font-size: 2.2rem;
@@ -88,7 +113,7 @@ h1, h2, h3, p, label, a {
     text-transform: uppercase; 
 }
 
-/* Sottotitolo FUORI dal box (Grigio Chiaro) */
+/* Sottotitolo FUORI dal box */
 .form-subtitle {
     text-align: center;
     color: #ccc;
@@ -96,15 +121,15 @@ h1, h2, h3, p, label, a {
     font-size: 1.1rem;
 }
 
-/* Rimuove stile dai wrapper logici */
-#box-login, #box-register {
+/* Wrapper logici */
+#box-login, #box-register, #step-search, #step-verify, #step-reset {
     background: transparent;
     border: none;
     box-shadow: none;
     padding: 0;
 }
 
-/* LA CARD (Il box grigio contenitore) */
+/* LA CARD (Box grigio) */
 .form-card {
     background-color: #5A5B5E;
     border-radius: 20px;
@@ -114,7 +139,7 @@ h1, h2, h3, p, label, a {
     border: 1px solid #6e6f72;
 }
 
-.form-card:hover { transform: scale(1.02); }
+.form-card:hover { transform: scale(1.01); }
 
 /* =====================================================
    5. INPUT, GRIGLIE E FORM
@@ -143,12 +168,22 @@ input, select {
     transition: all 0.3s ease;
 }
 
-/* Stile specifico per il menu a tendina (Select) per farlo carino */
+/* --- NUOVO: Input specifico per Codice Backup --- */
+input[name="code_backup"] {
+    text-align: center;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-color: #FFD700; /* Bordo oro per evidenziarlo */
+}
+
+/* Select personalizzata */
 select {
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    /* Freccina dorata personalizzata */
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFD700%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
     background-position: right 15px top 50%;
@@ -162,18 +197,17 @@ input:focus, select:focus {
     background-color: #3A3B3D;
 }
 
-/* GRIGLIA: Affianca gli elementi (Nome/Cognome, ecc) */
+/* GRIGLIA */
 .input-row {
     display: flex;
     gap: 15px;
     width: 100%;
 }
 .input-row > div {
-    flex: 1; /* Distribuisce lo spazio equamente */
+    flex: 1; 
     display: flex;
     flex-direction: column;
 }
-/* Rimuove il margine top dalla label se è dentro una riga per allineamento */
 .input-row label { margin-top: 15px; } 
 
 
@@ -230,18 +264,20 @@ button:hover {
 }
 .auth-wrapper a:hover { color: #FFD700; }
 
-/* --- FIX LAYOUT MESSAGGI --- */
+/* =====================================================
+   8. ALERT E MESSAGGI
+===================================================== */
 .alert {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 10px;
     text-align: center;
     font-weight: bold;
-    width: 100%;             /* Occupa la larghezza disponibile */
-    box-sizing: border-box;  /* Include il padding nella larghezza */
+    width: 100%;             
+    box-sizing: border-box; 
+    line-height: 1.5; 
 }
 
-/* Stili specifici colori */
 .alert.error {
     background-color: rgba(255, 77, 77, 0.2);
     color: #ff4d4d;
@@ -251,6 +287,22 @@ button:hover {
     background-color: rgba(0, 255, 0, 0.2);
     color: #00ff00;
     border: 1px solid #00ff00;
+}
+
+/* --- NUOVO: Stile per la lista codici backup dentro l'alert --- */
+.alert ul {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 5px;
+    list-style-type: none; /* Toglie i pallini */
+}
+.alert ul li {
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
 }
 
 /* FOOTER */
@@ -268,12 +320,11 @@ footer {
    MOBILE RESPONSIVE
 ===================================================== */
 @media (max-width: 600px) {
-    /* Su mobile le righe diventano colonne */
     .input-row { flex-direction: column; gap: 0; }
-    
     .form-card { padding: 25px; }
     .titolo-fuori { font-size: 1.8rem; }
-    
-    /* Adatta il wrapper allo schermo piccolo */
     .auth-wrapper { max-width: 100%; padding: 10px; }
+    
+    /* Su mobile spostiamo leggermente la freccia */
+    .back-arrow { left: 15px; font-size: 24px; }
 }
