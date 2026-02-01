@@ -18,8 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 1. Controllo tramite Risposta alla Domanda
     if (!empty($risposta_utente)) {
-        $sql = "SELECT risposta_sicurezza FROM utenti WHERE id = $1";
-        $result = pg_query_params($db, $sql, array($user_id));
+        $sql = "SELECT risposta_sicurezza FROM utente WHERE id = $1";
+        $result = pg_query_params($db, $sql, array($username));
         $db_risposta = pg_fetch_result($result, 0, 0);
 
         // Confronto case-insensitive (ignorando maiuscole/minuscole) per UX
@@ -33,8 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } 
     // 2. Controllo tramite Codice di Backup (Il tuo tocco originale)
     elseif (!empty($codice_backup)) {
-        $sql = "SELECT id, codice_hash FROM codici_backup WHERE utente_id = $1 AND usato = FALSE";
-        $result = pg_query_params($db, $sql, array($user_id));
+        $sql = "SELECT id, codice_hash FROM codici_backup WHERE username = $1 AND usato = FALSE";
+        $result = pg_query_params($db, $sql, array($username));
         
         $valid_code = false;
         while ($row = pg_fetch_assoc($result)) {
