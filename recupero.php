@@ -44,7 +44,7 @@ if (isset($_POST['btn_search'])) {
         $error_msg = "Inserisci username o email.";
     } else {
         $query = "SELECT id, domanda_sicurezza FROM utente WHERE email=$1 OR username=$1";
-        $res = pg_query_params($conn, $query, array($input));
+        $res = pg_query_params($db, $query, array($input));
         
         if (pg_num_rows($res) > 0) {
             $row = pg_fetch_assoc($res);
@@ -68,14 +68,14 @@ if (isset($_POST['btn_verify'])) {
     $uid = $_SESSION['rec_id'];
     
     $query_risp = "SELECT risposta_sicurezza FROM utente WHERE id=$1";
-    $res_risp = pg_query_params($conn, $query_risp, array($uid));
+    $res_risp = pg_query_params($db, $query_risp, array($uid));
     $hash_risposta = pg_fetch_result($res_risp, 0, 0);
     
     if (password_verify($risposta_input, $hash_risposta)) {
         
 
         $query_codes = "SELECT id, codice_hash FROM codici_backup WHERE utente_id=$1 AND usato=FALSE";
-        $res_codes = pg_query_params($conn, $query_codes, array($uid));
+        $res_codes = pg_query_params($db, $query_codes, array($uid));
         
         $code_valid_id = null;
         
@@ -88,7 +88,7 @@ if (isset($_POST['btn_verify'])) {
         
         if ($code_valid_id) {
 
-            pg_query_params($conn, "UPDATE codici_backup SET usato=TRUE WHERE id=$1", array($code_valid_id));
+            pg_query_params($db, "UPDATE codici_backup SET usato=TRUE WHERE id=$1", array($code_valid_id));
             
             $_SESSION['rec_step'] = 'reset';
             header("Location: recupero.php");
@@ -115,7 +115,7 @@ if (isset($_POST['btn_reset'])) {
         // Aggiorna Password
         $new_hash = password_hash($pass1, PASSWORD_DEFAULT);
         $query_upd = "UPDATE utente SET password=$1 WHERE id=$2";
-        $res_upd = pg_query_params($conn, $query_upd, array($new_hash, $uid));
+        $res_upd = pg_query_params($db, $query_upd, array($new_hash, $uid));
         
         if ($res_upd) {
 

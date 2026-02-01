@@ -66,7 +66,7 @@ if (isset($_POST['btn_register'])) {
         } else {
             // Controllo esistenza utente
             $check_query = "SELECT id FROM utente WHERE email=$1 OR username=$2";
-            $res_check = pg_query_params($conn, $check_query, array($email_val, $username_val));
+            $res_check = pg_query_params($db, $check_query, array($email_val, $username_val));
 
             if (pg_num_rows($res_check) > 0) {
                 $error_msg = "Username o Email già presenti nel sistema.";
@@ -77,7 +77,7 @@ if (isset($_POST['btn_register'])) {
                 $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) 
                                  VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
                 
-                $res_ins = pg_query_params($conn, $insert_query, array(
+                $res_ins = pg_query_params($db, $insert_query, array(
                     $nome_val, 
                     $cognome_val, 
                     $email_val, 
@@ -100,7 +100,7 @@ if (isset($_POST['btn_register'])) {
                         $code_hash = password_hash($raw_code, PASSWORD_DEFAULT);
                         
                         $q_code = "INSERT INTO codici_backup (utente_id, codice_hash) VALUES ($1, $2)";
-                        pg_query_params($conn, $q_code, array($user_id, $code_hash));
+                        pg_query_params($db, $q_code, array($user_id, $code_hash));
                     }
 
                     $success_msg = "Registrazione completata! IMPORTANTE: Salva questi codici di recupero, non saranno mostrati mai più:";
@@ -108,7 +108,7 @@ if (isset($_POST['btn_register'])) {
                     
                     $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
                 } else {
-                    $error_msg = "Errore database: " . pg_last_error($conn);
+                    $error_msg = "Errore database: " . pg_last_error($db);
                 }
             }
         }
@@ -123,10 +123,10 @@ if (isset($_POST['btn_login'])) {
         $error_msg = "Inserisci username/email e password.";
     } else {
         $login_query = "SELECT * FROM utente WHERE username=$1 OR email=$1";
-        $res_login = pg_query_params($conn, $login_query, array($login_input_val));
+        $res_login = pg_query_params($db, $login_query, array($login_input_val));
         
         if (!$res_login) {
-            $error_msg = "Errore tecnico Login: " . pg_last_error($conn);
+            $error_msg = "Errore tecnico Login: " . pg_last_error($db);
         } else {
             $user_row = pg_fetch_assoc($res_login);
             
