@@ -1,17 +1,18 @@
 <?php
 session_start();
+// Se l'utente è già loggato, va alla dashboard
 if (isset($_SESSION['user_id'])) { header("Location: struttura.html"); exit(); }
 require_once 'db.php';
 
-// STATO INIZIALE: Quale tab mostrare? (login, register, codes)
+// Configurazione Tab Iniziale
 $current_view = 'login'; 
 
-// VARIABILI PER ERRORI E DATI STICKY
+// Variabili Errore e Sticky
 $err_login = "";
 $err_reg = "";
 $backup_codes = [];
 
-// Sticky Data
+// Dati Sticky (Input)
 $log_user = $_POST['log_user'] ?? '';
 $reg_nome = $_POST['reg_nome'] ?? '';
 $reg_cognome = $_POST['reg_cognome'] ?? '';
@@ -44,12 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
 // --- LOGICA REGISTRAZIONE ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'register') {
-    $current_view = 'register'; // Se c'è errore, rimani qui
+    $current_view = 'register'; 
     $pass = $_POST['reg_pass'] ?? '';
     $risp = $_POST['reg_risposta'] ?? '';
     $foto = 'resources/utente.png';
-
-    // (Qui logica upload foto se vuoi)
 
     $hash = password_hash($pass, PASSWORD_DEFAULT);
     $sql = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) 
@@ -59,13 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     if ($res) {
         $uid = pg_fetch_row($res)[0];
-        // Genera codici backup
+        // Genera codici
         for ($i=0; $i<3; $i++) {
             $c = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
             $backup_codes[] = $c;
             pg_query_params($db, "INSERT INTO codici_backup (utente_id, codice_hash) VALUES ($1, $2)", array($uid, password_hash($c, PASSWORD_DEFAULT)));
         }
-        $current_view = 'codes'; // Mostra schermata successo
+        $current_view = 'codes';
     } else {
         $err_reg = "Username o Email già esistenti.";
     }
@@ -101,6 +100,10 @@ include 'header.php';
                     Non hai un account? <span class="switch-link" onclick="switchView('register')">Registrati ora</span>
                 </p>
                 <p><a href="recupero.php" class="switch-link" style="color:#888; font-weight:normal;">Password dimenticata?</a></p>
+                
+                <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <a href="index.html" style="color: #666; font-size: 0.9rem; font-weight: normal;">&larr; Torna alla Homepage</a>
+                </div>
             </div>
         </div>
     </div>
@@ -151,18 +154,13 @@ include 'header.php';
 
     <script>
         function switchView(viewName) {
-            // Nascondi tutto
             document.querySelectorAll('.auth-section').forEach(el => el.classList.remove('active'));
-            // Mostra target
             document.getElementById('view-' + viewName).classList.add('active');
             
-            // Gestione Freccia Indietro
             const btn = document.getElementById('btn-back');
             if(viewName === 'login') btn.classList.remove('visible');
             else btn.classList.add('visible');
         }
-        
-        // Se PHP dice che siamo in register, mostra la freccia subito
         <?php if ($current_view === 'register') echo "document.getElementById('btn-back').classList.add('visible');"; ?>
     </script>
 

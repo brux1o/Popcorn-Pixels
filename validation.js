@@ -1,69 +1,49 @@
-/* ==============================================
-   VALIDAZIONE CLIENT-SIDE (validation.js)
-   ============================================== */
+/* CONTROLLI LATO CLIENT */
 
-// 1. Validazione LOGIN (login.php)
 function validateLogin() {
-    // NOTA: In login.php il campo si chiama 'username', non 'identificativo'
-    const userField = document.getElementsByName('username')[0];
-    const passField = document.getElementsByName('password')[0];
-
-    // Controllo esistenza elementi (per evitare errori in console se il campo manca)
-    if (!userField || !passField) return true;
-
-    const username = userField.value.trim();
-    const password = passField.value.trim();
-
-    if (username === "" || password === "") {
-        alert("Attenzione: Inserisci sia l'Username/Email che la Password.");
-        return false; // Blocca l'invio del form
-    }
-    return true; // Procede
-}
-
-// 2. Validazione REGISTRAZIONE (register.php)
-function validateRegister() {
-    const nome = document.getElementsByName('nome')[0].value.trim();
-    const cognome = document.getElementsByName('cognome')[0].value.trim();
-    const email = document.getElementsByName('email')[0].value.trim();
-    const password = document.getElementsByName('password')[0].value;
-    const risposta = document.getElementsByName('risposta_sicurezza')[0].value.trim();
-    
-    // Controllo campi vuoti generici
-    if (nome === "" || cognome === "" || risposta === "") {
-        alert("Tutti i campi (Nome, Cognome, Risposta di sicurezza) sono obbligatori.");
+    const user = document.querySelector('input[name="log_user"]').value;
+    const pass = document.querySelector('input[name="log_pass"]').value;
+    if (user.trim() === "" || pass.trim() === "") {
+        alert("Inserisci tutti i campi.");
         return false;
     }
-
-    // Controllo Email (RegEx base)
-    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailReg.test(email)) {
-        alert("Inserisci un indirizzo Email valido.");
-        return false;
-    }
-
-    // Controllo Lunghezza Password
-    if (password.length < 6) {
-        alert("La password deve essere di almeno 6 caratteri.");
-        return false;
-    }
-
     return true;
 }
 
-// 3. Validazione RESET PASSWORD (reset_password.php)
-function validateReset() {
-    // In reset_password.php il campo si chiama 'nuova_password'
-    const p1 = document.getElementsByName('nuova_password')[0].value;
-
-    if (p1.length < 6) {
-        alert("La nuova password deve avere almeno 6 caratteri.");
+function validateRegister() {
+    const nome = document.querySelector('input[name="reg_nome"]').value;
+    const email = document.querySelector('input[name="reg_email"]').value;
+    const pass = document.querySelector('input[name="reg_pass"]').value;
+    if (nome === "" || email === "" || pass === "") {
+        alert("Compila tutti i campi obbligatori.");
         return false;
     }
+    if (pass.length < 4) {
+        alert("La password è troppo corta (min 4 caratteri).");
+        return false;
+    }
+    return true;
+}
 
-    // Nota: Ho rimosso il controllo su 'c_password' perché nel file PHP 
-    // reset_password.php abbiamo messo solo un campo password per semplicità.
-    // Se vuoi la conferma, dobbiamo aggiungere l'input nell'HTML.
-    
+function validateRecupero() {
+    const input = document.querySelector('input[name="input_user"]').value;
+    if (input.trim() === "") {
+        alert("Inserisci email o username.");
+        return false;
+    }
+    return true;
+}
+
+function validateReset() {
+    const code = document.querySelector('input[name="code"]').value;
+    const newPass = document.querySelector('input[name="new_pass"]').value;
+    if (code.length !== 3) {
+        alert("Il codice deve essere di 3 cifre.");
+        return false;
+    }
+    if (newPass === "") {
+        alert("Inserisci la nuova password.");
+        return false;
+    }
     return true;
 }

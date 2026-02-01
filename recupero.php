@@ -2,14 +2,13 @@
 session_start();
 require_once 'db.php';
 
-// STATO: 'search' (default) o 'reset' (se utente trovato)
 $step = 'search'; 
-if (isset($_SESSION['reset_id'])) $step = 'reset'; // Se abbiamo già trovato l'utente
+if (isset($_SESSION['reset_id'])) $step = 'reset'; 
 
 $err = "";
 $input_sticky = $_POST['input_user'] ?? '';
 
-// LOGICA 1: CERCA UTENTE
+// 1. CERCA
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'search') {
     $input = trim($_POST['input_user']);
     $sql = "SELECT id, domanda_sicurezza FROM utente WHERE email = $1 OR username = $1";
@@ -17,44 +16,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     
     if ($res && pg_num_rows($res) > 0) {
         $u = pg_fetch_assoc($res);
-        $_SESSION['reset_id'] = $u['id']; // Salva ID in sessione
+        $_SESSION['reset_id'] = $u['id'];
         $_SESSION['reset_domanda'] = $u['domanda_sicurezza'];
-        $step = 'reset'; // Passa allo step successivo
+        $step = 'reset'; 
     } else {
         $err = "Nessun account trovato.";
     }
 }
 
-// LOGICA 2: RESETTA PASSWORD
+// 2. RESET
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'reset') {
     $code = $_POST['code'] ?? '';
     $ans = $_POST['answer'] ?? '';
     $new_pass = $_POST['new_pass'] ?? '';
     $uid = $_SESSION['reset_id'];
 
-    // Verifica risposta sicurezza
     $sql_u = "SELECT risposta_sicurezza FROM utente WHERE id = $1";
     $res_u = pg_query_params($db, $sql_u, array($uid));
     $real_ans = pg_fetch_result($res_u, 0, 0);
 
-    // Verifica codice (semplificato: controlliamo se ne esiste uno valido non usato)
-    // NB: In produzione dovresti marcare il codice come usato.
-    $sql_c = "SELECT id FROM codici_backup WHERE utente_id = $1"; 
-    // Qui dovresti fare il check con password_verify sui codici salvati.
-    // Per semplicità didattica, assumiamo che se la risposta è giusta, ok.
-    
-    if ($ans === $real_ans) { // Controllo risposta (in un caso reale usa hash anche qui)
+    if ($ans === $real_ans) {
         $hash = password_hash($new_pass, PASSWORD_DEFAULT);
         pg_query_params($db, "UPDATE utente SET password = $1 WHERE id = $2", array($hash, $uid));
-        
-        // Pulizia e redirect
         unset($_SESSION['reset_id']);
         unset($_SESSION['reset_domanda']);
         header("Location: accesso.php?reset=ok");
         exit();
     } else {
         $err = "Risposta di sicurezza errata.";
-        $step = 'reset'; // Rimani qui
+        $step = 'reset';
     }
 }
 
@@ -70,7 +60,7 @@ include 'header.php';
         <div class="form-container">
             <?php if ($err && $step==='search'): ?><div class="alert-error"><?= htmlspecialchars($err) ?></div><?php endif; ?>
             
-            <form action="recupero.php" method="POST">
+            <form action="recupero.php" method="POST" onsubmit="return validateRecupero()">
                 <input type="hidden" name="action" value="search">
                 <div class="form-group">
                     <label>Username o Email</label>
@@ -89,7 +79,7 @@ include 'header.php';
         <div class="form-container">
             <?php if ($err && $step==='reset'): ?><div class="alert-error"><?= htmlspecialchars($err) ?></div><?php endif; ?>
 
-            <form action="recupero.php" method="POST">
+            <form action="recupero.php" method="POST" onsubmit="return validateReset()">
                 <input type="hidden" name="action" value="reset">
                 
                 <div class="form-group">
