@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             if (password_verify($pass, $u['password'])) {
                 $_SESSION['user_id'] = $u['id'];
                 $_SESSION['username'] = $u['username'];
-                $_SESSION['foto_profilo'] = $u['immagine_profilo'];
+                $_SESSION['immagine_profilo'] = $u['immagine_profilo'];
                 header("Location: struttura.html");
                 exit();
             } else { $err_login = "Password errata."; }
@@ -100,10 +100,7 @@ include 'header.php';
                     Non hai un account? <span class="switch-link" onclick="switchView('register')">Registrati ora</span>
                 </p>
                 <p><a href="recupero.php" class="switch-link" style="color:#888; font-weight:normal;">Password dimenticata?</a></p>
-                
-                <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                    <a href="index.html" style="color: #666; font-size: 0.9rem; font-weight: normal;">&larr; Torna alla Homepage</a>
-                </div>
+                 
             </div>
         </div>
     </div>

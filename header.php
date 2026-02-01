@@ -15,7 +15,7 @@
             <a href="accesso.php" id="btn-back" class="tasto <?php echo (isset($mostra_freccia) && $mostra_freccia) ? 'visible' : ''; ?>">←</a>
         </div>
         
-        <a href="index.html" style="text-decoration: none;">
+        <a href="struttura.html" style="text-decoration: none;">
             <h1>Popcorn&Pixels</h1>
         </a>
 
