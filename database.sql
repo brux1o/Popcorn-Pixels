@@ -4,7 +4,6 @@ DROP TABLE IF EXISTS watchlist;
 DROP TABLE IF EXISTS preferiti;
 DROP TABLE IF EXISTS codici_backup;
 DROP TABLE IF EXISTS utente CASCADE; 
--- Nota: CASCADE elimina anche eventuali dipendenze rimaste
 
 -- 2. CREAZIONE TABELLA UTENTE
 CREATE TABLE utente (
@@ -15,7 +14,8 @@ CREATE TABLE utente (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL, 
     domanda_sicurezza VARCHAR(255) NOT NULL,
-    risposta_sicurezza VARCHAR(255) NOT NULL
+    risposta_sicurezza VARCHAR(255) NOT NULL,
+    immagine_profilo VARCHAR(255) DEFAULT 'resources/utente.png'
 );
 
 -- 3. TABELLA CODICI BACKUP
