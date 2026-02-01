@@ -7,16 +7,34 @@ html, body {
 }
 
 /* ================= HEADER FIX DEFINITIVO ================= */
-.user-menu {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    z-index: 1000;
-}
+.user-menu { 
+  position:  absolute;
+  top: 70px; 
+  left: 0; 
+  transform: 0; 
+  margin-left: 10px;
+  background-color: #3A3B3D; 
+  border: 1px solid #5A5B5E;
+  border-radius: 10px; 
+  padding: 10px;
+  min-width: 160px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6); 
+  z-index: 1000; } 
+    
+  .user-menu a { 
+    display: block; 
+    padding: 8px 10px;
+    color: #E0E0E0; 
+    text-decoration: none; 
+    border-radius: 6px; } 
+       
+  .user-menu a:hover {
+    background-color: #FFD700; 
+    color: #000; } 
 
 .user-menu.hidden {
-    display: none;
-}
+   display: none; }
+
 .header {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
