@@ -1,164 +1,220 @@
 <?php
 session_start();
-// Se l'utente è già loggato, va alla dashboard
-if (isset($_SESSION['user_id'])) { header("Location: struttura.html"); exit(); }
-require_once 'db.php';
 
-// Configurazione Tab Iniziale
-$current_view = 'login'; 
+// --- 1. CONFIGURAZIONE DATABASE ---
+require_once 'db.php'; 
 
-// Variabili Errore e Sticky
-$err_login = "";
-$err_reg = "";
-$backup_codes = [];
+// --- 2. GESTIONE MESSAGGI ---
+$error_msg = "";
+$success_msg = "";
+if (isset($_SESSION['msg_flash'])) {
+    $success_msg = $_SESSION['msg_flash'];
+    unset($_SESSION['msg_flash']); 
+}
 
-// Dati Sticky (Input)
-$log_user = $_POST['log_user'] ?? '';
-$reg_nome = $_POST['reg_nome'] ?? '';
-$reg_cognome = $_POST['reg_cognome'] ?? '';
-$reg_email = $_POST['reg_email'] ?? '';
-$reg_user = $_POST['reg_user'] ?? '';
-$reg_domanda = $_POST['reg_domanda'] ?? '';
+// --- 3. VARIABILI STICKY ---
+$nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
+$login_input_val = "";
+$show_register = false; 
 
-// --- LOGICA LOGIN ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'login') {
-    $current_view = 'login';
-    $pass = $_POST['log_pass'] ?? '';
+// --- 4. REGISTRAZIONE ---
+if (isset($_POST['btn_register'])) {
+    $show_register = true; 
     
-    if (empty($log_user) || empty($pass)) {
-        $err_login = "Inserisci username e password.";
+    $nome_val = htmlspecialchars(trim($_POST['reg_nome']));
+    $cognome_val = htmlspecialchars(trim($_POST['reg_cognome']));
+    $email_val = trim($_POST['reg_email']);
+    $username_val = trim($_POST['reg_username']);
+    $password = $_POST['reg_password'];
+    $domanda_val = $_POST['reg_domanda'];
+    $risposta = trim($_POST['reg_risposta']);
+
+    if (empty($nome_val) || empty($cognome_val) || empty($email_val) || empty($username_val) || empty($password) || empty($risposta)) {
+        $error_msg = "Compila tutti i campi obbligatori.";
+    } elseif (strlen($password) < 8) {
+        $error_msg = "La password deve essere almeno di 8 caratteri.";
     } else {
-        $sql = "SELECT id, username, password, immagine_profilo FROM utente WHERE username = $1 OR email = $1";
-        $res = @pg_query_params($db, $sql, array($log_user));
-        if ($res && pg_num_rows($res) > 0) {
-            $u = pg_fetch_assoc($res);
-            if (password_verify($pass, $u['password'])) {
-                $_SESSION['user_id'] = $u['id'];
-                $_SESSION['username'] = $u['username'];
-                $_SESSION['immagine_profilo'] = $u['immagine_profilo'];
-                header("Location: struttura.html");
-                exit();
-            } else { $err_login = "Password errata."; }
-        } else { $err_login = "Utente non trovato."; }
-    }
-}
+        $check_query = "SELECT id FROM utente WHERE email=$1 OR username=$2";
+        $res_check = pg_query_params($conn, $check_query, array($email_val, $username_val));
 
-// --- LOGICA REGISTRAZIONE ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'register') {
-    $current_view = 'register'; 
-    $pass = $_POST['reg_pass'] ?? '';
-    $risp = $_POST['reg_risposta'] ?? '';
-    $foto = 'resources/utente.png';
-
-    $hash = password_hash($pass, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id";
-    $params = array($reg_nome, $reg_cognome, $reg_email, $reg_user, $hash, $reg_domanda, $risp, $foto);
-    $res = @pg_query_params($db, $sql, $params);
-
-    if ($res) {
-        $uid = pg_fetch_row($res)[0];
-        // Genera codici
-        for ($i=0; $i<3; $i++) {
-            $c = str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
-            $backup_codes[] = $c;
-            pg_query_params($db, "INSERT INTO codici_backup (utente_id, codice_hash) VALUES ($1, $2)", array($uid, password_hash($c, PASSWORD_DEFAULT)));
+        if (pg_num_rows($res_check) > 0) {
+            $error_msg = "Username o Email già presenti nel sistema.";
+        } else {
+            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+            $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
+            
+            $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza) VALUES ($1,$2,$3,$4,$5,$6,$7)";
+            $res_ins = pg_query_params($conn, $insert_query, array($nome_val, $cognome_val, $email_val, $username_val, $pass_hash, $domanda_val, $risp_hash));
+            
+            if ($res_ins) {
+                $success_msg = "Registrazione completata! Ora puoi accedere.";
+                $show_register = false; 
+                $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
+            } else {
+                $error_msg = "Errore durante la registrazione.";
+            }
         }
-        $current_view = 'codes';
-    } else {
-        $err_reg = "Username o Email già esistenti.";
     }
 }
 
-include 'header.php';
+// --- 5. LOGIN (QUI AVVIENE IL "COLLEGAMENTO" DEL BOTTONE) ---
+if (isset($_POST['btn_login'])) { // <--- Questo cattura il click sul bottone 'ACCEDI'
+    $login_input_val = trim($_POST['login_input']);
+    $password = $_POST['login_password'];
+    
+    if (empty($login_input_val) || empty($password)) {
+        $error_msg = "Inserisci username/email e password.";
+    } else {
+        $login_query = "SELECT * FROM utente WHERE username=$1 OR email=$1";
+        $res_login = pg_query_params($conn, $login_query, array($login_input_val));
+        $user_row = pg_fetch_assoc($res_login);
+        
+        // Se la password è corretta...
+        if ($user_row && password_verify($password, $user_row['password'])) {
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = $user_row['id'];
+            $_SESSION['username'] = $user_row['username'];
+            $_SESSION['nome'] = $user_row['nome']; 
+            $_SESSION['logged_in'] = true;
+            
+            // ... TI MANDA QUI:
+            header("Location: paginapersona.html");
+            exit;
+        } else {
+            $error_msg = "Credenziali non corrette.";
+        }
+    }
+}
 ?>
 
-    <div id="view-login" class="auth-section <?php echo ($current_view === 'login') ? 'active' : ''; ?>">
-        <div class="auth-header">
-            <h1>BENTORNATO</h1>
-            <h3>Accedi al tuo account</h3>
-        </div>
-        <div class="form-container">
-            <?php if ($err_login): ?><div class="alert-error"><?= htmlspecialchars($err_login) ?></div><?php endif; ?>
-            <?php if (isset($_GET['reset']) && $_GET['reset']=='ok'): ?><div class="alert" style="color:#0f0; border-color:#0f0;">Password aggiornata!</div><?php endif; ?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accedi - Popcorn&Pixels</title>
+    <link rel="icon" type="image/png" href="resources/icona.png">
+    
+    <link rel="stylesheet" href="stile/accesso.css">
+    <script src="validation.js" defer></script>
+</head>
+<body>
 
-            <form action="accesso.php" method="POST" onsubmit="return validateLogin()">
-                <input type="hidden" name="action" value="login">
-                <div class="form-group">
+    <header class="main-header">
+        <div class="logo-center">
+            <a href="struttura.html" id="homepage" class="tasto-tondo" style="text-decoration:none;">
+                <img src="resources/icona.png" alt="Homepage">
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container auth-page">
+
+    <?php if($error_msg): ?>
+        <div class="alert error" style="max-width: 600px; margin: 0 auto 20px auto;">
+            <?= $error_msg; ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if($success_msg): ?>
+        <div class="alert success" style="max-width: 600px; margin: 0 auto 20px auto;">
+            <?= $success_msg; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="auth-wrapper">
+        
+        <div id="box-login" style="display: <?php echo $show_register ? 'none' : 'block'; ?>;">
+            <h2 class="titolo-fuori">BENTORNATO</h2>
+            <p class="form-subtitle">Accedi al tuo account</p>
+            
+            <div class="form-card">
+                <form action="accesso.php" method="POST" onsubmit="return validateLogin()">
                     <label>Username o Email</label>
-                    <input type="text" name="log_user" value="<?= htmlspecialchars($log_user) ?>" required>
-                </div>
-                <div class="form-group">
+                    <input type="text" name="login_input" value="<?= htmlspecialchars($login_input_val); ?>" placeholder="Inserisci user o email" required>
+                    
                     <label>Password</label>
-                    <input type="password" name="log_pass" required>
-                </div>
-                <button type="submit" class="btn-submit">ACCEDI</button>
-            </form>
-
-            <div style="margin-top: 25px;">
-                <p style="color: #ccc; margin-bottom:10px;">
-                    Non hai un account? <span class="switch-link" onclick="switchView('register')">Registrati ora</span>
+                    <input type="password" name="login_password" placeholder="La tua password" required>
+                    
+                    <div style="margin-top: 10px; text-align: right;">
+                        <a href="recupero.php">Password dimenticata?</a>
+                    </div>
+                    
+                    <button type="submit" name="btn_login">ACCEDI</button>
+                </form>
+                <p class="switch-text">
+                    Non hai un account? <span onclick="mostraRegistrazione()">Registrati</span>
                 </p>
-                <p><a href="recupero.php" class="switch-link" style="color:#888; font-weight:normal;">Password dimenticata?</a></p>
-                 
             </div>
         </div>
-    </div>
 
-    <div id="view-register" class="auth-section <?php echo ($current_view === 'register') ? 'active' : ''; ?>">
-        <div class="auth-header">
-            <h1>REGISTRAZIONE</h1>
-            <h3>Crea un nuovo account</h3>
-        </div>
-        <div class="form-container">
-            <?php if ($err_reg): ?><div class="alert-error"><?= htmlspecialchars($err_reg) ?></div><?php endif; ?>
+        <div id="box-register" style="display: <?php echo $show_register ? 'block' : 'none'; ?>;">
+            <h2 class="titolo-fuori">NUOVO UTENTE</h2>
+            <p class="form-subtitle">Crea il tuo profilo personale</p>
+            
+            <div class="form-card">
+                <form action="accesso.php" method="POST" onsubmit="return validateRegister()">
+                    
+                    <div class="input-row">
+                        <div>
+                            <label>Nome</label>
+                            <input type="text" name="reg_nome" placeholder="Nome" value="<?= htmlspecialchars($nome_val); ?>" required>
+                        </div>
+                        <div>
+                            <label>Cognome</label>
+                            <input type="text" name="reg_cognome" placeholder="Cognome" value="<?= htmlspecialchars($cognome_val); ?>" required>
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div style="flex: 1.5;">
+                            <label>Email</label>
+                            <input type="email" name="reg_email" placeholder="Email" value="<?= htmlspecialchars($email_val); ?>" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Username</label>
+                            <input type="text" name="reg_username" placeholder="Username" value="<?= htmlspecialchars($username_val); ?>" required>
+                        </div>
+                    </div>
+                    
+                    <label>Password</label>
+                    <input type="password" name="reg_password" id="regPass" placeholder="Minimo 8 caratteri" required>
+                    
+                    <div class="input-row">
+                        <div style="flex: 1;">
+                            <label>Domanda Sicurezza</label>
+                            <select name="reg_domanda" required>
+                                <option value="" disabled <?= ($domanda_val=="")?'selected':''; ?>>Scegli...</option>
+                                <option value="animale" <?= ($domanda_val=="animale")?'selected':''; ?>>Nome animale?</option>
+                                <option value="madre" <?= ($domanda_val=="madre")?'selected':''; ?>>Cognome madre?</option>
+                                <option value="citta" <?= ($domanda_val=="citta")?'selected':''; ?>>Città nascita?</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Risposta</label>
+                            <input type="text" name="reg_risposta" placeholder="Risposta" required>
+                        </div>
+                    </div>
 
-            <form action="accesso.php" method="POST" enctype="multipart/form-data" onsubmit="return validateRegister()">
-                <input type="hidden" name="action" value="register">
-                <div class="form-group"><label>Nome</label><input type="text" name="reg_nome" value="<?= htmlspecialchars($reg_nome) ?>" required></div>
-                <div class="form-group"><label>Cognome</label><input type="text" name="reg_cognome" value="<?= htmlspecialchars($reg_cognome) ?>" required></div>
-                <div class="form-group"><label>Email</label><input type="email" name="reg_email" value="<?= htmlspecialchars($reg_email) ?>" required></div>
-                <div class="form-group"><label>Username</label><input type="text" name="reg_user" value="<?= htmlspecialchars($reg_user) ?>" required></div>
-                <div class="form-group"><label>Password</label><input type="password" name="reg_pass" required></div>
-                
-                <div class="form-group">
-                    <label>Domanda Sicurezza</label>
-                    <select name="reg_domanda">
-                        <option value="Città">Città di nascita?</option>
-                        <option value="Animale">Nome animale domestico?</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Risposta</label><input type="text" name="reg_risposta" required></div>
-
-                <button type="submit" class="btn-submit">REGISTRATI</button>
-            </form>
-            <p style="margin-top:20px; color:#ccc;">Hai già un account? <span class="switch-link" onclick="switchView('login')">Accedi</span></p>
-        </div>
-    </div>
-
-    <div id="view-codes" class="auth-section <?php echo ($current_view === 'codes') ? 'active' : ''; ?>">
-        <div class="auth-header">
-            <h1>COMPLETATO!</h1>
-            <h3>Salva i tuoi codici</h3>
-        </div>
-        <div class="form-container">
-            <div class="backup-box">
-                <?php foreach($backup_codes as $c) echo "<span>$c</span>"; ?>
+                    <button type="submit" name="btn_register">REGISTRATI</button>
+                </form>
+                <p class="switch-text">
+                    Hai già un account? <span onclick="mostraLogin()">Accedi</span>
+                </p>
             </div>
-            <button class="btn-submit" onclick="switchView('login')">VAI AL LOGIN</button>
         </div>
     </div>
 
     <script>
-        function switchView(viewName) {
-            document.querySelectorAll('.auth-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewName).classList.add('active');
-            
-            const btn = document.getElementById('btn-back');
-            if(viewName === 'login') btn.classList.remove('visible');
-            else btn.classList.add('visible');
+        function mostraRegistrazione() {
+            document.getElementById('box-login').style.display = 'none';
+            document.getElementById('box-register').style.display = 'block';
         }
-        <?php if ($current_view === 'register') echo "document.getElementById('btn-back').classList.add('visible');"; ?>
+        function mostraLogin() {
+            document.getElementById('box-register').style.display = 'none';
+            document.getElementById('box-login').style.display = 'block';
+        }
     </script>
+    <script src="validation.js"></script>
 
 <?php include 'footer.php'; ?>

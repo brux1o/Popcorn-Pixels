@@ -1,291 +1,275 @@
-/* ============================================================
-   1. RESET E STRUTTURA PAGINA
-   ============================================================ */
-   * {
+/* =====================================================
+   1. RESET E BASE
+===================================================== */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%; /* Necessario per centratura verticale */
+}
+
 body {
-    /* Grigio scuro di base */
     background-color: #48494B;
-    
-    /* Leggera sfumatura radiale per effetto "faretto" cinema (opzionale, molto elegante) */
-    background: radial-gradient(circle at center, #555658 0%, #48494B 100%);
-    
     color: #E0E0E0;
     font-family: 'Cambria', Georgia, serif;
+    
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
+}
+
+/* Transizioni globali per hover fluidi */
+h1, h2, h3, p, label, a {
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* =====================================================
+   2. HEADER
+===================================================== */
+.main-header {
     display: flex;
-    flex-direction: column; /* Fondamentale per il footer in basso */
-    line-height: 1.6;
-}
-
-/* Transizioni morbide per tutto */
-a, button, input, .tasto {
-    transition: all 0.2s ease-in-out;
-}
-
-/* ============================================================
-   2. HEADER FISSO (Sticky Top)
-   ============================================================ */
-header {
+    justify-content: center;
+    align-items: center;
     background-color: #3A3B3D;
-    border-bottom: 2px solid #5A5B5E; /* Separatore sottile */
     padding: 15px 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* Ombra più decisa */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-bottom: 2px solid #5A5B5E;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    height: 80px;
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
 }
 
-/* Lato Sinistro (Freccia) */
-#sinistra {
+/* STILE PER L'ICONA HEADER */
+.tasto-tondo img {
+    height: 60px; /* Dimensione fissa adatta all'header di 80px */
+    width: auto;  /* Mantiene le proporzioni */
+    display: block; /* Rimuove spazi bianchi indesiderati sotto */
+    transition: transform 0.3s ease;
+}
+
+.tasto-tondo:hover img {
+    transform: scale(1.1); /* Zoom leggero al passaggio del mouse */
+}
+
+/* =====================================================
+   3. MAIN CONTAINER
+===================================================== */
+.main-container {
     flex: 1;
     display: flex;
+    justify-content: center;
     align-items: center;
-    justify-content: flex-start;
-}
-
-/* Centro (Titolo) */
-header h1 {
-    flex: 0 0 auto;
-    font-size: 24px;
-    color: #FFD700; /* Oro */
-    margin: 0;
-    text-transform: none; /* Permette minuscole */
-    font-weight: bold;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
-
-/* Lato Destro (Vuoto) */
-header > div:last-child {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-}
-
-/* Tasto Freccia */
-.tasto {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #CCC;
-    font-size: 2rem;
-    text-decoration: none;
-    padding: 0 10px;
-    display: none; /* Gestito da JS/PHP */
-    line-height: 1;
-}
-
-.tasto.visible {
-    display: block;
-}
-
-.tasto:hover {
-    transform: translateX(-3px); /* Si muove a sinistra */
-    color: #FFD700;
-}
-
-/* ============================================================
-   3. LAYOUT PRINCIPALE E LOGICA TABS
-   ============================================================ */
-.main {
+    padding: 40px 20px;
     width: 100%;
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-    flex: 1; /* Spinge il footer in basso se c'è poco contenuto */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
 }
 
-/* Le sezioni (Login, Register, ecc.) */
-.auth-section {
-    display: none;
+/* Wrapper che si adatta se c'è la registrazione (più larga) */
+.auth-wrapper {
     width: 100%;
-    flex-direction: column;
-    align-items: center;
-    /* Appare dolcemente */
-    animation: fadeIn 0.3s ease-out; 
+    max-width: 600px; 
+    transition: max-width 0.3s ease;
 }
 
-.auth-section.active {
-    display: flex;
-}
+/* =====================================================
+   4. CARD E TITOLI
+===================================================== */
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================================
-   4. TITOLI ESTERNI AL BOX
-   ============================================================ */
-.auth-header {
+/* Titolo FUORI dal box (Giallo e Grande) */
+.titolo-fuori {
     text-align: center;
+    font-size: 2.2rem;
+    color: #FFD700;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-transform: uppercase; 
+}
+
+/* Sottotitolo FUORI dal box (Grigio Chiaro) */
+.form-subtitle {
+    text-align: center;
+    color: #ccc;
     margin-bottom: 25px;
-}
-
-.auth-header h1 {
-    font-size: 2.4rem;
-    color: #FFD700;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.4);
-}
-
-.auth-header h3 {
     font-size: 1.1rem;
-    color: #CCC;
-    margin-top: 5px;
-    font-weight: normal;
-    font-style: italic;
-    opacity: 0.9;
 }
 
-/* ============================================================
-   5. BOX DEL FORM (Card Grigia)
-   ============================================================ */
-.form-container {
-    background-color: #5A5B5E; /* Grigio Box */
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5); /* Ombra profonda */
-    width: 100%;
-    max-width: 440px; /* Larghezza ottimale */
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.05); /* Bordo impercettibile per definizione */
-}
-
-/* ============================================================
-   6. INPUT E BOTTONI
-   ============================================================ */
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-    color: #FFD700;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 14px;
-    background-color: #48494B; /* Input scuro */
-    border: 2px solid #3A3B3D; /* Bordo scuro */
-    border-radius: 8px;
-    color: #FFF;
-    font-size: 1rem;
-    outline: none;
-    font-family: 'Cambria', Georgia, serif;
-}
-
-/* Effetto Focus Input */
-input:focus, select:focus {
-    border-color: #FFD700;
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-    background-color: #404143;
-}
-
-/* Bottone Giallo */
-.btn-submit {
-    background-color: #FFD700;
-    color: #111;
-    font-weight: 800;
-    padding: 14px 30px;
+/* Rimuove stile dai wrapper logici */
+#box-login, #box-register {
+    background: transparent;
     border: none;
-    border-radius: 50px; /* Pillola */
-    font-size: 1.1rem;
-    cursor: pointer;
-    width: 100%;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* LA CARD (Il box grigio contenitore) */
+.form-card {
+    background-color: #5A5B5E;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    transition: transform 0.3s ease;
+    border: 1px solid #6e6f72;
+}
+
+.form-card:hover { transform: scale(1.02); }
+
+/* =====================================================
+   5. INPUT, GRIGLIE E FORM
+===================================================== */
+form { display: flex; flex-direction: column; }
+
+label {
     margin-top: 15px;
-    font-family: 'Cambria', Georgia, serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.btn-submit:hover {
-    background-color: #FFC107; /* Giallo leggermente più caldo */
-    transform: translateY(-2px); /* Si alza */
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
-}
-
-.btn-submit:active {
-    transform: translateY(0);
-}
-
-/* ============================================================
-   7. MESSAGGI E LINK
-   ============================================================ */
-a {
-    color: #FFD700;
-    text-decoration: none;
+    margin-bottom: 5px;
+    color: #E0E0E0;
     font-weight: bold;
+    font-size: 0.95rem;
 }
-a:hover {
-    text-decoration: underline;
-    color: #FFF;
+label:hover { color: #FFD700; }
+
+/* Stile Input Base */
+input, select {
+    background-color: #48494B;
+    border: 2px solid #3A3B3D;
+    color: #E0E0E0;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    width: 100%;
+    font-family: 'Cambria', serif;
+    transition: all 0.3s ease;
 }
 
-.switch-link {
+/* Stile specifico per il menu a tendina (Select) per farlo carino */
+select {
+    appearance: none;
+    -webkit-appearance: none;
     cursor: pointer;
-    color: #FFD700;
-    font-weight: bold;
-}
-.switch-link:hover {
-    text-decoration: underline;
-    color: #FFF;
-}
-
-.alert-error {
-    background: rgba(231, 76, 60, 0.15); /* Rosso trasparente */
-    border: 1px solid #e74c3c;
-    color: #ff6b6b;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 0.9rem;
+    /* Freccina dorata personalizzata */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFD700%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+    padding-right: 30px;
 }
 
-.backup-box {
-    background: #333;
-    padding: 15px;
-    border: 2px dashed #FFD700;
-    color: #FFD700;
-    font-family: monospace;
-    font-size: 1.4rem;
-    margin: 20px 0;
-    border-radius: 8px;
+input:focus, select:focus {
+    outline: none;
+    border-color: #FFD700;
+    background-color: #3A3B3D;
+}
+
+/* GRIGLIA: Affianca gli elementi (Nome/Cognome, ecc) */
+.input-row {
     display: flex;
-    justify-content: space-around;
+    gap: 15px;
+    width: 100%;
+}
+.input-row > div {
+    flex: 1; /* Distribuisce lo spazio equamente */
+    display: flex;
+    flex-direction: column;
+}
+/* Rimuove il margine top dalla label se è dentro una riga per allineamento */
+.input-row label { margin-top: 15px; } 
+
+
+/* =====================================================
+   6. BOTTONI
+===================================================== */
+button {
+    margin-top: 35px;
+    background-color: #FFD700;
+    color: #3A3B3D;
+    border: none;
+    padding: 15px;
+    font-size: 1.2rem;
     font-weight: bold;
+    cursor: pointer;
+    border-radius: 30px;
+    font-family: 'Cambria', serif;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* ============================================================
-   8. FOOTER (MIGLIORATO E STICKY)
-   ============================================================ */
-   footer {
+button:hover {
+    transform: scale(1.05);
+    background-color: #e6c200;
+    color: #000;
+}
+
+/* =====================================================
+   7. LINK E SWITCH
+===================================================== */
+.switch-text {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+.switch-text span {
+    color: #FFD700;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+.switch-text span:hover { transform: scale(1.1); }
+
+.auth-wrapper a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+.auth-wrapper a:hover { color: #FFD700; }
+
+/* MESSAGGI */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+.alert.error {
+    background-color: rgba(255, 77, 77, 0.2);
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+}
+.alert.success {
+    background-color: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+/* FOOTER */
+footer {
     background-color: #3A3B3D;
     border-top: 2px solid #5A5B5E;
     padding: 15px;
     text-align: center;
     color: #E0E0E0;
     font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* =====================================================
+   MOBILE RESPONSIVE
+===================================================== */
+@media (max-width: 600px) {
+    /* Su mobile le righe diventano colonne */
+    .input-row { flex-direction: column; gap: 0; }
+    
+    .form-card { padding: 25px; }
+    .titolo-fuori { font-size: 1.8rem; }
+    
+    /* Adatta il wrapper allo schermo piccolo */
+    .auth-wrapper { max-width: 100%; padding: 10px; }
 }
