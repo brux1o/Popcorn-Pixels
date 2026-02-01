@@ -16,9 +16,10 @@ if (isset($db)) {
     die("Errore Critico: Nessuna variabile di connessione (\$db o \$conn) trovata in db.php");
 }
 
-// --- 2. GESTIONE MESSAGGI ---
+// --- 2. GESTIONE MESSAGGI E VARIABILI ---
 $error_msg = "";
 $success_msg = "";
+$codes_to_show = []; // Array per i codici di backup da mostrare
 
 if (isset($_SESSION['msg_flash'])) {
     $success_msg = $_SESSION['msg_flash'];
@@ -50,14 +51,13 @@ if (isset($_POST['btn_register'])) {
     if (isset($_FILES['reg_foto']) && $_FILES['reg_foto']['error'] === 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
         $filename = $_FILES['reg_foto']['name'];
-        // Estensione del file
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         
         if (in_array($ext, $allowed)) {
-            // Creiamo un nome unico per evitare sovrascritture
+            // Nome unico
             $new_filename = uniqid() . "_" . $username_val . "." . $ext;
             
-            // Assicurati che la cartella 'uploads' esista!
+            // Creazione cartella se non esiste
             if (!is_dir('uploads')) { mkdir('uploads', 0777, true); }
 
             $upload_path = "uploads/" . $new_filename;
@@ -89,8 +89,9 @@ if (isset($_POST['btn_register'])) {
                 $pass_hash = password_hash($password, PASSWORD_DEFAULT);
                 $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
                 
-                // INSERT
-                $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)";
+                // INSERT UTENTE (Con RETURNING id per i codici backup)
+                $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) 
+                                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
                 
                 $res_ins = pg_query_params($conn, $insert_query, array(
                     $nome_val, 
@@ -104,8 +105,27 @@ if (isset($_POST['btn_register'])) {
                 ));
                 
                 if ($res_ins) {
-                    $success_msg = "Registrazione completata! Ora puoi accedere.";
+                    // Recuperiamo l'ID appena creato
+                    $user_id = pg_fetch_result($res_ins, 0, 0);
+
+                    // --- GENERAZIONE 3 CODICI DI BACKUP ---
+                    for ($i = 0; $i < 3; $i++) {
+                        // Genera codice random (8 caratteri esadecimali)
+                        $raw_code = strtoupper(bin2hex(random_bytes(4))); 
+                        $codes_to_show[] = $raw_code; // Salviamo per mostrarlo all'utente
+                        
+                        // Hashiamo il codice per il DB
+                        $code_hash = password_hash($raw_code, PASSWORD_DEFAULT);
+                        
+                        // Inseriamo nella tabella codici_backup
+                        $q_code = "INSERT INTO codici_backup (utente_id, codice_hash) VALUES ($1, $2)";
+                        pg_query_params($conn, $q_code, array($user_id, $code_hash));
+                    }
+
+                    $success_msg = "Registrazione completata! IMPORTANTE: Salva questi codici di recupero, non saranno mostrati mai più:";
                     $show_register = false; 
+                    
+                    // Reset campi sticky
                     $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
                 } else {
                     $error_msg = "Errore database: " . pg_last_error($conn);
@@ -177,7 +197,18 @@ if (isset($_POST['btn_login'])) {
         <?php endif; ?>
         
         <?php if($success_msg): ?>
-            <div class="alert success"><?= $success_msg; ?></div>
+            <div class="alert success" style="text-align: left;">
+                <?= $success_msg; ?>
+                
+                <?php if(!empty($codes_to_show)): ?>
+                    <ul style="margin-top: 10px; font-family: monospace; font-size: 1.2rem; font-weight: bold; background: rgba(0,0,0,0.1); padding: 10px 20px; border-radius: 5px; list-style-type: none;">
+                        <?php foreach($codes_to_show as $code): ?>
+                            <li style="margin-bottom: 5px;">🔐 <?= $code; ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <small style="display:block; margin-top:5px;">Scrivili su un foglio o fai una foto ora!</small>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <div id="box-login" style="display: <?php echo $show_register ? 'none' : 'block'; ?>;">
