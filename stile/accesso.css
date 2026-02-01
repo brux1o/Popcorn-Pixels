@@ -1,242 +1,275 @@
-/* ============================================================
-   RESET E IMPOSTAZIONI BASE
-   [Requisito: Selettore di TIPO]
-   ============================================================ */
-   * {
+/* =====================================================
+   1. RESET E BASE
+===================================================== */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%; /* Necessario per centratura verticale */
+}
+
 body {
-    background-color: #1a1a1a;
-    /* Sfondo sfumato per dare profondità */
-    background: radial-gradient(circle at center, #252525 0%, #121212 100%);
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #48494B;
+    color: #E0E0E0;
+    font-family: 'Cambria', Georgia, serif;
+    
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Forza il footer in basso */
-    line-height: 1.6;
+    min-height: 100vh;
 }
 
-/* ============================================================
-   HEADER E NAVBAR
-   [Requisito: Selettore DESCENDANT (discendente)]
-   ============================================================ */
-header {
-    background: rgba(0, 0, 0, 0.8);
-    border-bottom: 1px solid rgba(212, 160, 23, 0.3); /* Oro spento */
-    padding: 10px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* Transizioni globali per hover fluidi */
+h1, h2, h3, p, label, a {
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.navbar {
+/* =====================================================
+   2. HEADER
+===================================================== */
+.main-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    background-color: #3A3B3D;
+    padding: 15px 25px;
+    border-bottom: 2px solid #5A5B5E;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    height: 80px;
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
 }
 
-/* Gestione delle 3 colonne dell'header per centrare il logo */
-.nav-left, .nav-right {
-    flex: 1; /* Occupano lo stesso spazio ai lati */
-    display: flex;
-}
-
-.nav-center {
-    flex: 0; /* Il centro occupa solo lo spazio necessario */
-    text-align: center;
-}
-
-/* [Requisito: Selettore ID] */
-#homepage-logo img, 
-.nav-logo {
-    height: 60px;
+/* STILE PER L'ICONA HEADER */
+.tasto-tondo img {
+    height: 60px; /* Dimensione fissa adatta all'header di 80px */
+    width: auto;  /* Mantiene le proporzioni */
+    display: block; /* Rimuove spazi bianchi indesiderati sotto */
     transition: transform 0.3s ease;
 }
 
-/* [Requisito: Selettore PSEUDO-CLASSE :hover] */
-.nav-logo:hover {
-    transform: scale(1.1); /* Leggero zoom al passaggio del mouse */
+.tasto-tondo:hover img {
+    transform: scale(1.1); /* Zoom leggero al passaggio del mouse */
 }
 
-.nav-button {
-    color: #d4a017;
-    text-decoration: none;
+/* =====================================================
+   3. MAIN CONTAINER
+===================================================== */
+.main-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    width: 100%;
+}
+
+/* Wrapper che si adatta se c'è la registrazione (più larga) */
+.auth-wrapper {
+    width: 100%;
+    max-width: 600px; 
+    transition: max-width 0.3s ease;
+}
+
+/* =====================================================
+   4. CARD E TITOLI
+===================================================== */
+
+/* Titolo FUORI dal box (Giallo e Grande) */
+.titolo-fuori {
+    text-align: center;
+    font-size: 2.2rem;
+    color: #FFD700;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-transform: uppercase; 
+}
+
+/* Sottotitolo FUORI dal box (Grigio Chiaro) */
+.form-subtitle {
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* Rimuove stile dai wrapper logici */
+#box-login, #box-register {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* LA CARD (Il box grigio contenitore) */
+.form-card {
+    background-color: #5A5B5E;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    transition: transform 0.3s ease;
+    border: 1px solid #6e6f72;
+}
+
+.form-card:hover { transform: scale(1.02); }
+
+/* =====================================================
+   5. INPUT, GRIGLIE E FORM
+===================================================== */
+form { display: flex; flex-direction: column; }
+
+label {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #E0E0E0;
     font-weight: bold;
-    font-size: 14px;
-    padding: 8px 20px;
-    border: 1px solid #d4a017;
-    border-radius: 25px;
+    font-size: 0.95rem;
+}
+label:hover { color: #FFD700; }
+
+/* Stile Input Base */
+input, select {
+    background-color: #48494B;
+    border: 2px solid #3A3B3D;
+    color: #E0E0E0;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    width: 100%;
+    font-family: 'Cambria', serif;
     transition: all 0.3s ease;
 }
 
-.nav-button:hover {
-    background: #d4a017;
-    color: #121212;
-}
-
-/* ============================================================
-   CONTENUTO PRINCIPALE
-   [Requisito: Selettore CLASSE]
-   ============================================================ */
-main {
-    flex: 1; /* Spinge il footer in basso */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Centra verticalmente il form */
-    padding: 40px 20px;
-}
-
-.page-wrapper {
-    width: 100%;
-    max-width: 450px;
-    background: #1e1e1e;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Ombra profonda */
-    border: 1px solid #333;
-    text-align: center;
-}
-
-/* [Requisito: Selettore UNIONE (raggruppamento)] */
-h1, h2 {
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.page-title {
-    color: #d4a017; /* Oro */
-    font-size: 28px;
-    margin-bottom: 5px;
-}
-
-.page-subtitle {
-    color: #888;
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 30px;
-}
-
-/* ============================================================
-   FORM E INPUT
-   [Requisito: Selettore CHILD (figlio diretto >)]
-   ============================================================ */
-form {
-    text-align: left;
-}
-
-/* Seleziona le label che sono figlie dirette di form o div */
-.form-group > label, 
-form > label {
-    display: block;
-    color: #d4a017;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s;
+/* Stile specifico per il menu a tendina (Select) per farlo carino */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    /* Freccina dorata personalizzata */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFD700%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+    padding-right: 30px;
 }
 
 input:focus, select:focus {
-    border-color: #d4a017; /* Bordo oro quando attivo */
-    box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
+    outline: none;
+    border-color: #FFD700;
+    background-color: #3A3B3D;
 }
 
-/* [Requisito: Selettore PSEUDO-ELEMENTO ::placeholder] */
-input::placeholder {
-    color: #666;
-    font-style: italic;
-}
-
-/* Gestione layout a due colonne (Nome/Cognome) */
-.form-row {
+/* GRIGLIA: Affianca gli elementi (Nome/Cognome, ecc) */
+.input-row {
     display: flex;
     gap: 15px;
-}
-
-.form-group {
-    flex: 1;
-}
-
-/* Pulsante Submit */
-button[type="submit"] {
     width: 100%;
-    padding: 14px;
-    background: #d4a017;
-    color: #121212;
+}
+.input-row > div {
+    flex: 1; /* Distribuisce lo spazio equamente */
+    display: flex;
+    flex-direction: column;
+}
+/* Rimuove il margine top dalla label se è dentro una riga per allineamento */
+.input-row label { margin-top: 15px; } 
+
+
+/* =====================================================
+   6. BOTTONI
+===================================================== */
+button {
+    margin-top: 35px;
+    background-color: #FFD700;
+    color: #3A3B3D;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    padding: 15px;
+    font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
+    border-radius: 30px;
+    font-family: 'Cambria', serif;
+    transition: all 0.3s ease;
     text-transform: uppercase;
-    margin-top: 10px;
-    transition: transform 0.2s, background 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-button[type="submit"]:hover {
-    background: #f1c40f; /* Oro più chiaro */
-    transform: translateY(-2px); /* Effetto sollevamento */
+button:hover {
+    transform: scale(1.05);
+    background-color: #e6c200;
+    color: #000;
 }
 
-/* ============================================================
-   ALERT E MESSAGGI ERRORE
-   ============================================================ */
+/* =====================================================
+   7. LINK E SWITCH
+===================================================== */
+.switch-text {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+.switch-text span {
+    color: #FFD700;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+.switch-text span:hover { transform: scale(1.1); }
+
+.auth-wrapper a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+.auth-wrapper a:hover { color: #FFD700; }
+
+/* MESSAGGI */
 .alert {
     padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 25px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.alert-error {
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-}
-
-/* Piccoli link sotto il form (recupero pass, registrati) */
-a {
-    color: #d4a017;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-a:hover {
-    color: #fff;
-    text-decoration: underline;
-}
-
-/* ============================================================
-   FOOTER
-   ============================================================ */
-footer {
-    background: #111;
-    color: #555;
+    margin-bottom: 20px;
+    border-radius: 10px;
     text-align: center;
-    padding: 20px;
-    font-size: 12px;
-    border-top: 1px solid #222;
-    margin-top: auto;
+    font-weight: bold;
+}
+.alert.error {
+    background-color: rgba(255, 77, 77, 0.2);
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+}
+.alert.success {
+    background-color: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+/* FOOTER */
+footer {
+    background-color: #3A3B3D;
+    border-top: 2px solid #5A5B5E;
+    padding: 15px;
+    text-align: center;
+    color: #E0E0E0;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* =====================================================
+   MOBILE RESPONSIVE
+===================================================== */
+@media (max-width: 600px) {
+    /* Su mobile le righe diventano colonne */
+    .input-row { flex-direction: column; gap: 0; }
+    
+    .form-card { padding: 25px; }
+    .titolo-fuori { font-size: 1.8rem; }
+    
+    /* Adatta il wrapper allo schermo piccolo */
+    .auth-wrapper { max-width: 100%; padding: 10px; }
 }

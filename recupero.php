@@ -1,156 +1,154 @@
 <?php
-/* ==========================================
-   SEZIONE 1: CONFIGURAZIONE E DEBUG
-   ========================================== */
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
+// Includiamo la connessione centralizzata
+require_once 'db.php';
 
-/* ==========================================
-   SEZIONE 2: CONNESSIONE AL DATABASE
-   ========================================== */
-if (!file_exists('db.php')) {
-    die("<h2 style='color:red; text-align:center; margin-top:50px;'>ERRORE GRAVE: Manca il file 'db.php' nella cartella!</h2>");
+// Variabili di stato
+$step = 'search'; 
+$error_msg = "";
+$success_msg = "";
+$input_sticky = ""; // Per riempire il campo se c'è un errore
+
+// Se l'utente ha già superato il primo step, lo recuperiamo dalla sessione
+if (isset($_SESSION['reset_id']) && isset($_SESSION['reset_domanda'])) {
+    $step = 'reset';
 }
 
-require_once 'db.php'; 
-
-$errore = "";
-
-/* ==========================================
-   SEZIONE 3: LOGICA DEL FORM (BACKEND)
-   ========================================== */
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $input = trim($_POST['input_utente'] ?? '');
-
-    if (!$db) {
-        $errore = "Impossibile connettersi al Database. Controlla db.php.";
+// --- LOGICA STEP 1: CERCA UTENTE ---
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'search') {
+    $input_sticky = trim($_POST['input_user']);
+    
+    if (empty($input_sticky)) {
+        $error_msg = "Inserisci username o email.";
     } else {
-        $sql = "SELECT id, domanda_sicurezza FROM utente WHERE email ILIKE $1 OR username ILIKE $1";
-        $result = @pg_query_params($db, $sql, array($input)); 
-
-        if ($result && pg_num_rows($result) > 0) {
-            $user = pg_fetch_assoc($result);
+        // Usa $conn che arriva da db.php
+        $sql = "SELECT id, domanda_sicurezza FROM utente WHERE email = $1 OR username = $1";
+        $res = pg_query_params($conn, $sql, array($input_sticky));
+        
+        if ($res && pg_num_rows($res) > 0) {
+            $u = pg_fetch_assoc($res);
+            $_SESSION['reset_id'] = $u['id'];
+            $_SESSION['reset_domanda'] = $u['domanda_sicurezza'];
             
-            $_SESSION['reset_user_id'] = $user['id'];
-            $_SESSION['reset_domanda'] = $user['domanda_sicurezza'];
-            
-            header("Location: reset_password.php");
-            exit(); 
+            // Ricarica la pagina per passare allo step successivo pulito
+            header("Location: recupero.php");
+            exit;
         } else {
-            $errore = "Nessun account trovato con questo nome o email.";
+            $error_msg = "Nessun account trovato.";
+        }
+    }
+}
+
+// --- LOGICA STEP 2: RESET PASSWORD ---
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'reset') {
+    $ans = trim($_POST['answer']);
+    $new_pass = $_POST['new_pass'];
+    $uid = $_SESSION['reset_id'];
+
+    // Validazione base
+    if (empty($ans) || empty($new_pass)) {
+        $error_msg = "Compila tutti i campi.";
+    } elseif (strlen($new_pass) < 8) {
+        $error_msg = "La password deve essere di almeno 8 caratteri.";
+    } else {
+        // Recupera la risposta hashata dal DB
+        $sql_u = "SELECT risposta_sicurezza FROM utente WHERE id = $1";
+        $res_u = pg_query_params($conn, $sql_u, array($uid));
+        $real_ans_hash = pg_fetch_result($res_u, 0, 0);
+
+        // VERIFICA LA RISPOSTA (Usa password_verify!)
+        if (password_verify($ans, $real_ans_hash)) {
+            // Crea il nuovo hash per la password
+            $new_hash = password_hash($new_pass, PASSWORD_DEFAULT);
+            
+            // Aggiorna
+            $sql_upd = "UPDATE utente SET password = $1 WHERE id = $2";
+            if (pg_query_params($conn, $sql_upd, array($new_hash, $uid))) {
+                // Pulizia e redirect
+                unset($_SESSION['reset_id']);
+                unset($_SESSION['reset_domanda']);
+                $_SESSION['msg_flash'] = "Password aggiornata! Accedi ora.";
+                header("Location: accesso.php");
+                exit();
+            } else {
+                $error_msg = "Errore nell'aggiornamento del database.";
+            }
+        } else {
+            $error_msg = "Risposta di sicurezza errata.";
         }
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recupero Password</title>
-    <link rel="icon" type="image/png" href="resources/icona.png">
 
-    <style>
-        /* Reset di base */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background: #1a1a1a;
-            background: radial-gradient(circle at center, #222222 0%, #1a1a1a 100%);
-            color: #e8e8e8;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        
-        /* Navbar superiore */
-        header { width: 100%; background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid rgba(212, 160, 23, 0.2); }
-        .navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 40px; max-width: 1200px; margin: 0 auto;
-        }
-        .nav-center img { height: 50px; vertical-align: middle; } /* Logo */
-        
-        /* Bottone Indietro */
-        .nav-button {
-            color: #d4a017; text-decoration: none; font-weight: bold;
-            padding: 8px 20px; border: 1px solid #d4a017; border-radius: 25px; transition: 0.3s;
-        }
-        .nav-button:hover { background: #d4a017; color: #000; } 
-        
-        /* Layout centrale */
-        main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .page-wrapper { width: 100%; max-width: 420px; text-align: center; }
-        .page-title { color: #d4a017; font-size: 32px; margin-bottom: 10px; text-transform: uppercase; }
-        .page-subtitle { color: #888; margin-bottom: 30px; }
-        
-        /* Stile del Form */
-        form {
-            background: #262626; padding: 35px; border-radius: 15px;
-            border: 1px solid #333; box-shadow: 0 15px 45px rgba(0,0,0,0.5);
-        }
-        label { display: block; text-align: left; color: #d4a017; margin-bottom: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase;}
-        
-        input {
-            width: 100%; padding: 12px; margin-bottom: 20px; background: #1e1e1e;
-            border: 1px solid #444; color: white; border-radius: 8px; outline: none;
-        }
-        input:focus { border-color: #d4a017; }
-        
-        button {
-            width: 100%; padding: 15px; background: #d4a017; color: #1a1a1a; border: none;
-            border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; text-transform: uppercase;
-        }
-        button:hover { background: #f1c40f; transform: translateY(-2px); }
-        
-        .alert { 
-            background: rgba(255, 77, 77, 0.15); color: #ff4d4d; 
-            padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ff4d4d;
-        }
-        
-        footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-    </style>
-</head>
-<body>
+<?php include 'header.php'; ?>
 
-    <header>
-        <nav class="navbar">
-            <div style="flex:1; display:flex; justify-content:flex-start;"> 
-                <a href="login.php" class="nav-button">Indietro</a>
-            </div>
-
-            <div class="nav-center" style="flex:0;">
-                <a href="struttura.html">
-                    <img src="resources/icona.png" alt="Logo">
-                </a>
-            </div>
-
-            <div style="flex:1;"></div> 
-        </nav>
-    </header>
-
-    <main>
-        <div class="page-wrapper">
-            <h1 class="page-title">Recupero</h1>
-            <h2 class="page-subtitle">Inserisci i dati per trovare l'account</h2>
-            
-            <?php if ($errore): ?>
-                <div class="alert"><?= htmlspecialchars($errore) ?></div>
-            <?php endif; ?>
-
-            <form action="recupero.php" method="POST">
-                <label>Username o Email</label>
-                <input type="text" name="input_utente" required placeholder="Es. mariorossi o mario@email.it">
-                
-                <button type="submit">Cerca Account</button>
-            </form>
+<main class="main-container auth-page">
+    
+    <?php if ($error_msg): ?>
+        <div class="alert error" style="background:#ffcccc; color:#900; padding:10px; margin-bottom:15px; text-align:center;">
+            <?= htmlspecialchars($error_msg) ?>
         </div>
-    </main>
+    <?php endif; ?>
 
-    <?php include("footer.php"); ?>
-</body>
-</html>
+    <div class="auth-wrapper" style="max-width: 500px; margin: 0 auto;">
+        
+        <div id="step-search" style="display: <?php echo ($step === 'search') ? 'block' : 'none'; ?>;">
+            <div class="auth-header" style="text-align: center; margin-bottom: 20px;">
+                <h2>Recupero Password</h2>
+                <p>Inserisci i tuoi dati per iniziare</p>
+            </div>
+            
+            <form action="recupero.php" method="POST" onsubmit="return validateRecupero()">
+                <input type="hidden" name="action" value="search">
+                
+                <label>Username o Email</label>
+                <input type="text" name="input_user" value="<?= htmlspecialchars($input_sticky) ?>" required>
+                
+                <button type="submit" class="btn-submit" style="margin-top: 15px;">CERCA</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="accesso.php">Annulla</a>
+            </div>
+        </div>
+
+        <div id="step-reset" style="display: <?php echo ($step === 'reset') ? 'block' : 'none'; ?>;">
+            <div class="auth-header" style="text-align: center; margin-bottom: 20px;">
+                <h2>Verifica Sicurezza</h2>
+            </div>
+            
+            <form action="recupero.php" method="POST" onsubmit="return validateReset()">
+                <input type="hidden" name="action" value="reset">
+                
+                <div class="form-group" style="background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <strong>Domanda:</strong> 
+                    <?php 
+                        $d = $_SESSION['reset_domanda'] ?? '';
+                        // Mappatura leggibile delle domande (coerente con accesso.php)
+                        if($d == 'animale') echo "Nome del primo animale domestico?";
+                        elseif($d == 'madre') echo "Cognome da nubile di tua madre?";
+                        elseif($d == 'citta') echo "Città di nascita?";
+                        elseif($d == 'scuola') echo "Nome scuola elementare?";
+                        else echo htmlspecialchars($d); 
+                    ?>
+                </div>
+
+                <label>La tua risposta</label>
+                <input type="text" name="answer" placeholder="Rispondi qui..." required>
+                
+                <label>Nuova Password</label>
+                <input type="password" name="new_pass" placeholder="Minimo 8 caratteri" required>
+
+                <button type="submit" class="btn-submit" style="margin-top: 15px;">SALVA NUOVA PASSWORD</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="accesso.php">Annulla</a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="validation.js"></script>
+<?php include 'footer.php'; ?>
