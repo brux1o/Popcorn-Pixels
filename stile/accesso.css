@@ -230,14 +230,18 @@ button:hover {
 }
 .auth-wrapper a:hover { color: #FFD700; }
 
-/* MESSAGGI */
+/* --- FIX LAYOUT MESSAGGI --- */
 .alert {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 10px;
     text-align: center;
     font-weight: bold;
+    width: 100%;             /* Occupa la larghezza disponibile */
+    box-sizing: border-box;  /* Include il padding nella larghezza */
 }
+
+/* Stili specifici colori */
 .alert.error {
     background-color: rgba(255, 77, 77, 0.2);
     color: #ff4d4d;
