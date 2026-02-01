@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const response = await fetch('get_user.php');
@@ -15,14 +17,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+ 
     const elUsername = document.getElementById('user-username');
     const elNome = document.getElementById('user-nome');
     const elCognome = document.getElementById('user-cognome');
     const elEmail = document.getElementById('user-email');
 
     if (elUsername) elUsername.textContent = utente.username;
-    if(elNome) elNome.textContent = utente.nome;
-    if(elCognome) elCognome.textContent = utente.cognome;
-    if(elEmail) elEmail.textContent = utente.email;
+    if (elNome) elNome.textContent = utente.nome;
+    if (elCognome) elCognome.textContent = utente.cognome;
+    if (elEmail) elEmail.textContent = utente.email;
 
-});
+   
+    const avatar = document.querySelector('.profile-avatar');
+    if (avatar && utente.immagine_profilo) {
+        avatar.src = utente.immagine_profilo;
+    }
+
+})

@@ -3,25 +3,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const commentiSection = document.getElementById('commenti');
     if (!commentiSection) return;
 
-    const response = await fetch('get_commenti.php'); 
+    const response = await fetch('get_commenti.php');
     const commenti = await response.json();
 
-    commenti.forEach(commento => {
-        creaCommento(commento);
-    });
+    commenti.forEach(c => creaCommento(c));
+
+    // ✅ ATTIVO DRAG & DROP
+    abilitaDragAndDrop('#commenti', '.comment-card');
 
     function creaCommento(commento) {
         const card = document.createElement('div');
         card.classList.add('comment-card');
+        card.setAttribute('draggable', true); // 🔴 FONDAMENTALE
 
         card.innerHTML = `
             <div class="comment-header">
-                <span class="comment-film">
-                    TITOLO: ${commento.titolo}
-                </span>
-                <span class="comment-date">
-                    ${commento.data_inserimento}
-                </span>
+                <span>${commento.titolo}</span>
+                <span>${commento.data_inserimento}</span>
             </div>
 
             <p class="comment-text">${commento.testo}</p>
@@ -34,54 +32,56 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         commentiSection.appendChild(card);
     }
+});
 
-    commentiSection.addEventListener('click', async (e) => {
 
-        const btnDelete = e.target.closest('.btn-delete');
-        if (btnDelete) {
-            const commentId = btnDelete.dataset.id;
+/* =========================
+   DRAG & DROP – VERSIONE STABILE
+   ========================= */
 
-            if (!confirm('Vuoi eliminare questo commento?')) return;
+function abilitaDragAndDrop(containerSelector, itemSelector) {
 
-            const response = await fetch('delete_commento.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${commentId}`
-            });
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
 
-            const result = await response.text();
+    let draggedItem = null;
 
-            if (result.trim() === 'OK') {
-                btnDelete.closest('.comment-card').remove();
-            } else {
-                alert('Errore durante eliminazione commento');
-            }
-        }
+    container.addEventListener('dragstart', (e) => {
+        const item = e.target.closest(itemSelector);
+        if (!item) return;
 
-        const btnEdit = e.target.closest('.btn-edit');
-        if (btnEdit) {
-            const commentId = btnEdit.dataset.id;
-            const card = btnEdit.closest('.comment-card');
-            const testoP = card.querySelector('.comment-text');
-
-            const nuovoTesto = prompt('Modifica commento:', testoP.textContent);
-
-            if (nuovoTesto === null || nuovoTesto.trim() === "") return;
-
-            const response = await fetch('update_commento.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${commentId}&testo=${encodeURIComponent(nuovoTesto)}`
-            });
-
-            const result = await response.text();
-
-            if (result.trim() === 'OK') {
-                testoP.textContent = nuovoTesto;
-            } else {
-                alert('Errore durante modifica commento');
-            }
-        }
+        draggedItem = item;
+        item.classList.add('dragging');
     });
 
-});
+    container.addEventListener('dragend', () => {
+        if (draggedItem) draggedItem.classList.remove('dragging');
+        draggedItem = null;
+    });
+
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+
+        const afterElement = getAfterElement(container, itemSelector, e.clientY);
+
+        if (!afterElement) {
+            container.appendChild(draggedItem);
+        } else {
+            container.insertBefore(draggedItem, afterElement);
+        }
+    });
+}
+
+function getAfterElement(container, itemSelector, y) {
+    const elements = [...container.querySelectorAll(`${itemSelector}:not(.dragging)`)];
+
+    return elements.reduce((closest, el) => {
+        const box = el.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            return { offset, element: el };
+        }
+        return closest;
+    }, { offset: -Infinity }).element;
+} 
