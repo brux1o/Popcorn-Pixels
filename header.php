@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Popcorn & Pixels</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popcorn&Pixels</title>
+    
     <link rel="icon" type="image/png" href="resources/icona.png">
     
     <link rel="stylesheet" href="stile/accesso.css">
@@ -10,16 +12,20 @@
     <script src="validation.js" defer></script>
 </head>
 <body>
-    <header>
-        <div id="sinistra">
-            <a href="accesso.php" id="btn-back" class="tasto <?php echo (isset($mostra_freccia) && $mostra_freccia) ? 'visible' : ''; ?>">←</a>
+    <header class="main-header">
+        
+        <?php if (!isset($nascondi_freccia) || $nascondi_freccia === false): ?>
+            <a href="index.php" class="back-btn" title="Torna alla Home">
+                &#8592; 
+            </a>
+        <?php endif; ?>
+
+        <div class="logo-center">
+            <a href="struttura.html">
+                <h1>Popcorn&Pixels</h1>
+            </a>
         </div>
         
-        <a href="struttura.html" style="text-decoration: none;">
-            <h1>Popcorn&Pixels</h1>
-        </a>
-
-        <div style="flex: 1;"></div>
     </header>
 
-    <div class="main">
+    <main class="main-container">
