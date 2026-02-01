@@ -1,22 +1,12 @@
 <?php
-// --- ABILITA VISUALIZZAZIONE ERRORI ---
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
 
-// --- 1. CONFIGURAZIONE DATABASE ---
 require_once 'db.php'; 
 
-// FIX DATABASE: Collega $db a $conn se necessario
-if (isset($db)) {
-    $conn = $db;
-} elseif (!isset($conn)) {
-    die("Errore Critico: Nessuna variabile di connessione (\$db o \$conn) trovata in db.php");
-}
-
-// --- 2. GESTIONE MESSAGGI E VARIABILI ---
 $error_msg = "";
 $success_msg = "";
 $codes_to_show = []; // Array per i codici di backup da mostrare
@@ -26,16 +16,13 @@ if (isset($_SESSION['msg_flash'])) {
     unset($_SESSION['msg_flash']); 
 }
 
-// --- 3. VARIABILI STICKY ---
 $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
 $login_input_val = "";
 $show_register = false; 
 
-// --- 4. REGISTRAZIONE ---
 if (isset($_POST['btn_register'])) {
     $show_register = true; 
     
-    // Raccolta dati
     $nome_val = htmlspecialchars(trim($_POST['reg_nome']));
     $cognome_val = htmlspecialchars(trim($_POST['reg_cognome']));
     $email_val = trim($_POST['reg_email']);
@@ -44,7 +31,6 @@ if (isset($_POST['btn_register'])) {
     $domanda_val = $_POST['reg_domanda'];
     $risposta = trim($_POST['reg_risposta']);
 
-    // --- GESTIONE CARICAMENTO FOTO ---
     $percorso_immagine = 'resources/utente.png'; // Default
     
     // Se l'utente ha caricato un file valido
@@ -54,7 +40,7 @@ if (isset($_POST['btn_register'])) {
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         
         if (in_array($ext, $allowed)) {
-            // Nome unico
+
             $new_filename = uniqid() . "_" . $username_val . "." . $ext;
             
             // Creazione cartella se non esiste
@@ -72,7 +58,6 @@ if (isset($_POST['btn_register'])) {
         }
     }
 
-    // --- VALIDAZIONE E INSERT ---
     if (empty($error_msg)) {
         if (empty($nome_val) || empty($cognome_val) || empty($email_val) || empty($username_val) || empty($password) || empty($risposta)) {
             $error_msg = "Compila tutti i campi obbligatori.";
@@ -89,7 +74,6 @@ if (isset($_POST['btn_register'])) {
                 $pass_hash = password_hash($password, PASSWORD_DEFAULT);
                 $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
                 
-                // INSERT UTENTE (Con RETURNING id per i codici backup)
                 $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) 
                                  VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
                 
@@ -105,19 +89,16 @@ if (isset($_POST['btn_register'])) {
                 ));
                 
                 if ($res_ins) {
-                    // Recuperiamo l'ID appena creato
                     $user_id = pg_fetch_result($res_ins, 0, 0);
 
-                    // --- GENERAZIONE 3 CODICI DI BACKUP ---
                     for ($i = 0; $i < 3; $i++) {
                         // Genera codice random (8 caratteri esadecimali)
                         $raw_code = strtoupper(bin2hex(random_bytes(4))); 
-                        $codes_to_show[] = $raw_code; // Salviamo per mostrarlo all'utente
+                        $codes_to_show[] = $raw_code; 
                         
                         // Hashiamo il codice per il DB
                         $code_hash = password_hash($raw_code, PASSWORD_DEFAULT);
                         
-                        // Inseriamo nella tabella codici_backup
                         $q_code = "INSERT INTO codici_backup (utente_id, codice_hash) VALUES ($1, $2)";
                         pg_query_params($conn, $q_code, array($user_id, $code_hash));
                     }
@@ -125,7 +106,6 @@ if (isset($_POST['btn_register'])) {
                     $success_msg = "Registrazione completata! IMPORTANTE: Salva questi codici di recupero, non saranno mostrati mai più:";
                     $show_register = false; 
                     
-                    // Reset campi sticky
                     $nome_val = $cognome_val = $email_val = $username_val = $domanda_val = "";
                 } else {
                     $error_msg = "Errore database: " . pg_last_error($conn);
@@ -135,7 +115,6 @@ if (isset($_POST['btn_register'])) {
     }
 }
 
-// --- 5. LOGIN ---
 if (isset($_POST['btn_login'])) {
     $login_input_val = trim($_POST['login_input']);
     $password = $_POST['login_password'];
