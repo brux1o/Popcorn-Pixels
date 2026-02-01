@@ -314,7 +314,7 @@ header {
 }
 
 /* =====================================================
-   DRAG & DROP – FIX DEFINITIVO
+   DRAG & DROP 
 ===================================================== */
 .comment-card.dragging,
 .movie-card.dragging {
@@ -323,6 +323,9 @@ header {
     transition: none !important;
     box-shadow: none !important;
   
+}
+.action-icons button {
+    cursor: pointer;
 }
 
 /* =====================================================

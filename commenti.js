@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const commentiSection = document.getElementById('commenti');
@@ -8,13 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     commenti.forEach(c => creaCommento(c));
 
-    // ✅ ATTIVO DRAG & DROP
+    // ✅ DRAG & DROP (solo asse Y)
     abilitaDragAndDrop('#commenti', '.comment-card');
 
     function creaCommento(commento) {
         const card = document.createElement('div');
         card.classList.add('comment-card');
-        card.setAttribute('draggable', true); // 🔴 FONDAMENTALE
+        card.setAttribute('draggable', true);
 
         card.innerHTML = `
             <div class="comment-header">
@@ -30,13 +32,78 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
 
+        // ✅ DISABILITA IL DRAG SOLO QUANDO CLICCHI I BOTTONI
+        card.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                card.setAttribute('draggable', false);
+            });
+
+            btn.addEventListener('mouseup', () => {
+                card.setAttribute('draggable', true);
+            });
+        });
+
         commentiSection.appendChild(card);
     }
+
+    /* =========================
+       CLICK EDIT / DELETE
+       ========================= */
+
+    commentiSection.addEventListener('click', async (e) => {
+
+        // 🗑️ DELETE
+        const deleteBtn = e.target.closest('.btn-delete');
+        if (deleteBtn) {
+            if (!confirm('Vuoi eliminare il commento?')) return;
+
+            const id = deleteBtn.dataset.id;
+
+            const response = await fetch('delete_commento.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${id}`
+            });
+
+            if ((await response.text()).trim() === 'OK') {
+                deleteBtn.closest('.comment-card').remove();
+                 if (typeof aggiornaStats === 'function') {
+                        aggiornaStats();}
+            } else {
+                alert('Errore eliminazione commento');
+            }
+            return;
+        }
+
+        // ✏️ EDIT
+        const editBtn = e.target.closest('.btn-edit');
+        if (editBtn) {
+            const id = editBtn.dataset.id;
+            const nuovoTesto = prompt('Modifica commento:');
+            if (!nuovoTesto) return;
+
+            const response = await fetch('update_commento.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${id}&testo=${encodeURIComponent(nuovoTesto)}`
+            });
+
+            if ((await response.text()).trim() === 'OK') {
+                editBtn
+                    .closest('.comment-card')
+                    .querySelector('.comment-text')
+                    .textContent = nuovoTesto;
+            } else {
+                alert('Errore modifica commento');
+            }
+        }
+    });
+
 });
 
 
 /* =========================
-   DRAG & DROP – VERSIONE STABILE
+   DRAG & DROP – FIX DEFINITIVO
    ========================= */
 
 function abilitaDragAndDrop(containerSelector, itemSelector) {
@@ -47,6 +114,9 @@ function abilitaDragAndDrop(containerSelector, itemSelector) {
     let draggedItem = null;
 
     container.addEventListener('dragstart', (e) => {
+        // 🔒 BLOCCA DRAG SE PARTI DA UN BOTTONE
+        if (e.target.closest('button')) return;
+
         const item = e.target.closest(itemSelector);
         if (!item) return;
 
@@ -55,7 +125,10 @@ function abilitaDragAndDrop(containerSelector, itemSelector) {
     });
 
     container.addEventListener('dragend', () => {
-        if (draggedItem) draggedItem.classList.remove('dragging');
+        document
+            .querySelectorAll('.dragging')
+            .forEach(el => el.classList.remove('dragging'));
+
         draggedItem = null;
     });
 
@@ -82,6 +155,7 @@ function getAfterElement(container, itemSelector, y) {
         if (offset < 0 && offset > closest.offset) {
             return { offset, element: el };
         }
+
         return closest;
     }, { offset: -Infinity }).element;
-} 
+}
