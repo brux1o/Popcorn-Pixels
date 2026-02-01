@@ -1,12 +1,9 @@
-
-
-document.addEventListener('DOMContentLoaded', async () => {
+async function aggiornaStats() {
 
     const numPreferiti = document.getElementById('num-preferiti');
     const numWatchlist = document.getElementById('num-watchlist');
     const numCommenti  = document.getElementById('num-commenti');
 
-    // se per qualche motivo gli elementi non esistono, esco
     if (!numPreferiti || !numWatchlist || !numCommenti) return;
 
     const response = await fetch('get_stats.php');
@@ -16,4 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     numWatchlist.textContent = stats.watchlist;
     numCommenti.textContent  = stats.commenti;
 
-})
+    console.log('STATS AGGIORNATE'); // debug
+}
+
+
+document.addEventListener('DOMContentLoaded', aggiornaStats);

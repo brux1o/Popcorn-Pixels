@@ -246,7 +246,7 @@ h2:hover {
 /* ================= STATO UTENTE ================= */
 
 #stato-utente.online {
-  color: green;
+  color: rgb(33, 242, 33);
   font-weight: bold;
 }
 
