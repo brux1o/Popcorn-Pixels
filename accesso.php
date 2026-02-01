@@ -9,7 +9,7 @@ session_start();
 // --- 1. CONFIGURAZIONE DATABASE ---
 require_once 'db.php'; 
 
-// FIX DATABASE: Collega $db a $conn
+// FIX DATABASE: Collega $db a $conn se necessario
 if (isset($db)) {
     $conn = $db;
 } elseif (!isset($conn)) {
@@ -43,28 +43,27 @@ if (isset($_POST['btn_register'])) {
     $domanda_val = $_POST['reg_domanda'];
     $risposta = trim($_POST['reg_risposta']);
 
-    // --- GESTIONE CARICAMENTO FOTO (PER VARCHAR) ---
-    // Valore di default come da tuo SQL
-    $percorso_immagine = 'resources/utente.png'; 
+    // --- GESTIONE CARICAMENTO FOTO ---
+    $percorso_immagine = 'resources/utente.png'; // Default
     
     // Se l'utente ha caricato un file valido
     if (isset($_FILES['reg_foto']) && $_FILES['reg_foto']['error'] === 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
         $filename = $_FILES['reg_foto']['name'];
-        $filetype = $_FILES['reg_foto']['type'];
-        $filesize = $_FILES['reg_foto']['size'];
-        
         // Estensione del file
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         
         if (in_array($ext, $allowed)) {
             // Creiamo un nome unico per evitare sovrascritture
             $new_filename = uniqid() . "_" . $username_val . "." . $ext;
+            
+            // Assicurati che la cartella 'uploads' esista!
+            if (!is_dir('uploads')) { mkdir('uploads', 0777, true); }
+
             $upload_path = "uploads/" . $new_filename;
             
-            // Spostiamo il file dalla temp alla cartella uploads
             if (move_uploaded_file($_FILES['reg_foto']['tmp_name'], $upload_path)) {
-                $percorso_immagine = $upload_path; // Questo andrà nel DB
+                $percorso_immagine = $upload_path; 
             } else {
                 $error_msg = "Errore nel salvataggio dell'immagine sul server.";
             }
@@ -73,8 +72,7 @@ if (isset($_POST['btn_register'])) {
         }
     }
 
-    // --- VALIDAZIONE ---
-    // Procediamo solo se non ci sono stati errori col file
+    // --- VALIDAZIONE E INSERT ---
     if (empty($error_msg)) {
         if (empty($nome_val) || empty($cognome_val) || empty($email_val) || empty($username_val) || empty($password) || empty($risposta)) {
             $error_msg = "Compila tutti i campi obbligatori.";
@@ -88,12 +86,10 @@ if (isset($_POST['btn_register'])) {
             if (pg_num_rows($res_check) > 0) {
                 $error_msg = "Username o Email già presenti nel sistema.";
             } else {
-                // Hashing
                 $pass_hash = password_hash($password, PASSWORD_DEFAULT);
                 $risp_hash = password_hash($risposta, PASSWORD_DEFAULT);
                 
-                // --- QUERY DI INSERIMENTO (AGGIORNATA PER IL TUO DB) ---
-                // La colonna è 'immagine_profilo'
+                // INSERT
                 $insert_query = "INSERT INTO utente (nome, cognome, email, username, password, domanda_sicurezza, risposta_sicurezza, immagine_profilo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)";
                 
                 $res_ins = pg_query_params($conn, $insert_query, array(
@@ -104,7 +100,7 @@ if (isset($_POST['btn_register'])) {
                     $pass_hash, 
                     $domanda_val, 
                     $risp_hash, 
-                    $percorso_immagine // Qui passiamo la stringa del percorso (es. 'uploads/foto.jpg')
+                    $percorso_immagine 
                 ));
                 
                 if ($res_ins) {
@@ -142,7 +138,7 @@ if (isset($_POST['btn_login'])) {
                 $_SESSION['nome'] = $user_row['nome']; 
                 $_SESSION['logged_in'] = true;
                 
-                header("Location: paginapersonale.html");
+                header("Location: struttura.html");
                 exit;
             } else {
                 $error_msg = "Credenziali non corrette.";
@@ -245,9 +241,9 @@ if (isset($_POST['btn_login'])) {
                             <label>Domanda Sicurezza</label>
                             <select name="reg_domanda" required>
                                 <option value="" disabled <?= ($domanda_val=="")?'selected':''; ?>>Scegli...</option>
-                                <option value="animale" <?= ($domanda_val=="animale")?'selected':''; ?>>Nome animale?</option>
-                                <option value="madre" <?= ($domanda_val=="madre")?'selected':''; ?>>Cognome madre?</option>
-                                <option value="citta" <?= ($domanda_val=="citta")?'selected':''; ?>>Città nascita?</option>
+                                <option value="animale" <?= ($domanda_val=="animale")?'selected':''; ?>>Nome prima animale?</option>
+                                <option value="madre" <?= ($domanda_val=="madre")?'selected':''; ?>>Cognome di tua madre?</option>
+                                <option value="citta" <?= ($domanda_val=="citta")?'selected':''; ?>>Città di nascita?</option>
                             </select>
                         </div>
                         <div style="flex: 1;">
@@ -257,7 +253,12 @@ if (isset($_POST['btn_login'])) {
                     </div>
 
                     <label style="margin-top: 15px;">Foto Profilo (Opzionale)</label>
-                    <input type="file" name="reg_foto" accept="image/*" style="padding: 10px; background: #48494B; border-radius: 10px;">
+                    
+                    <p style="font-size: 0.85rem; color: #ffeb3b; margin-bottom: 8px; margin-top: 0;">
+                        ⚠️ Attenzione: Questa immagine non potrà essere modificata successivamente.
+                    </p>
+
+                    <input type="file" name="reg_foto" accept="image/*" style="padding: 10px; background: #48494B; border-radius: 10px; border: 1px solid #3A3B3D; width: 100%;">
 
                     <button type="submit" name="btn_register">REGISTRATI</button>
                 </form>
