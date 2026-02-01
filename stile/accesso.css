@@ -1,242 +1,124 @@
 /* ============================================================
-   RESET E IMPOSTAZIONI BASE
-   [Requisito: Selettore di TIPO]
+   RESET E DESIGN BASE
    ============================================================ */
-   * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-    background-color: #1a1a1a;
-    /* Sfondo sfumato per dare profondità */
-    background: radial-gradient(circle at center, #252525 0%, #121212 100%);
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Forza il footer in basso */
-    line-height: 1.6;
-}
-
-/* ============================================================
-   HEADER E NAVBAR
-   [Requisito: Selettore DESCENDANT (discendente)]
-   ============================================================ */
-header {
-    background: rgba(0, 0, 0, 0.8);
-    border-bottom: 1px solid rgba(212, 160, 23, 0.3); /* Oro spento */
-    padding: 10px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Gestione delle 3 colonne dell'header per centrare il logo */
-.nav-left, .nav-right {
-    flex: 1; /* Occupano lo stesso spazio ai lati */
-    display: flex;
-}
-
-.nav-center {
-    flex: 0; /* Il centro occupa solo lo spazio necessario */
-    text-align: center;
-}
-
-/* [Requisito: Selettore ID] */
-#homepage-logo img, 
-.nav-logo {
-    height: 60px;
-    transition: transform 0.3s ease;
-}
-
-/* [Requisito: Selettore PSEUDO-CLASSE :hover] */
-.nav-logo:hover {
-    transform: scale(1.1); /* Leggero zoom al passaggio del mouse */
-}
-
-.nav-button {
-    color: #d4a017;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 14px;
-    padding: 8px 20px;
-    border: 1px solid #d4a017;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-}
-
-.nav-button:hover {
-    background: #d4a017;
-    color: #121212;
-}
-
-/* ============================================================
-   CONTENUTO PRINCIPALE
-   [Requisito: Selettore CLASSE]
-   ============================================================ */
-main {
-    flex: 1; /* Spinge il footer in basso */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Centra verticalmente il form */
-    padding: 40px 20px;
-}
-
-.page-wrapper {
-    width: 100%;
-    max-width: 450px;
-    background: #1e1e1e;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Ombra profonda */
-    border: 1px solid #333;
-    text-align: center;
-}
-
-/* [Requisito: Selettore UNIONE (raggruppamento)] */
-h1, h2 {
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.page-title {
-    color: #d4a017; /* Oro */
-    font-size: 28px;
-    margin-bottom: 5px;
-}
-
-.page-subtitle {
-    color: #888;
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 30px;
-}
-
-/* ============================================================
-   FORM E INPUT
-   [Requisito: Selettore CHILD (figlio diretto >)]
-   ============================================================ */
-form {
-    text-align: left;
-}
-
-/* Seleziona le label che sono figlie dirette di form o div */
-.form-group > label, 
-form > label {
-    display: block;
-    color: #d4a017;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-input:focus, select:focus {
-    border-color: #d4a017; /* Bordo oro quando attivo */
-    box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
-}
-
-/* [Requisito: Selettore PSEUDO-ELEMENTO ::placeholder] */
-input::placeholder {
-    color: #666;
-    font-style: italic;
-}
-
-/* Gestione layout a due colonne (Nome/Cognome) */
-.form-row {
-    display: flex;
-    gap: 15px;
-}
-
-.form-group {
-    flex: 1;
-}
-
-/* Pulsante Submit */
-button[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    background: #d4a017;
-    color: #121212;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-    margin-top: 10px;
-    transition: transform 0.2s, background 0.3s;
-}
-
-button[type="submit"]:hover {
-    background: #f1c40f; /* Oro più chiaro */
-    transform: translateY(-2px); /* Effetto sollevamento */
-}
-
-/* ============================================================
-   ALERT E MESSAGGI ERRORE
-   ============================================================ */
-.alert {
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 25px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.alert-error {
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-}
-
-/* Piccoli link sotto il form (recupero pass, registrati) */
-a {
-    color: #d4a017;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-a:hover {
-    color: #fff;
-    text-decoration: underline;
-}
-
-/* ============================================================
-   FOOTER
-   ============================================================ */
-footer {
-    background: #111;
-    color: #555;
-    text-align: center;
-    padding: 20px;
-    font-size: 12px;
-    border-top: 1px solid #222;
-    margin-top: auto;
-}
+   body {
+       background-color: #48494B;
+       color: #E0E0E0;
+       font-family: 'Cambria', Georgia, serif;
+       min-height: 100vh;
+       display: flex;
+       flex-direction: column;
+       line-height: 1.6;
+   }
+   
+   /* Transizioni */
+   a, button, input { transition: all 0.2s ease; }
+   
+   /* ============================================================
+      HEADER FISSO
+      ============================================================ */
+   header {
+       background-color: #3A3B3D;
+       border-bottom: 2px solid #5A5B5E;
+       padding: 15px 25px;
+       box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+       position: sticky;
+       top: 0;
+       z-index: 100;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+   }
+   
+   #sinistra { flex: 1; display: flex; align-items: center; justify-content: flex-start; }
+   
+   header h1 {
+       flex: 0 0 auto;
+       font-size: 24px;
+       color: #FFD700;
+       margin: 0;
+       text-transform: none; /* Minuscole permesse */
+       font-weight: bold;
+       font-family: 'Cambria', Georgia, serif;
+   }
+   
+   header > div:last-child { flex: 1; display: flex; justify-content: flex-end; }
+   
+   /* Tasto Freccia */
+   .tasto {
+       background: none; border: none; cursor: pointer; color: #E0E0E0;
+       font-size: 2rem; text-decoration: none; padding: 0 10px;
+       display: none; /* Nascosto di default, JS o PHP lo attivano */
+   }
+   .tasto.visible { display: block; }
+   .tasto:hover { transform: scale(1.2); color: #FFD700; }
+   
+   /* ============================================================
+      LAYOUT PRINCIPALE & SEZIONI
+      ============================================================ */
+   .main {
+       max-width: 1200px; margin: 40px auto; padding: 20px;
+       flex: 1; width: 100%;
+       display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+   }
+   
+   /* Logica TAB (Nascondi/Mostra) */
+   .auth-section {
+       display: none; /* Nascosto */
+       width: 100%;
+       flex-direction: column;
+       align-items: center;
+   }
+   .auth-section.active { display: flex; } /* Visibile */
+   
+   /* ============================================================
+      ELEMENTI UI (Titoli, Box, Input)
+      ============================================================ */
+   .auth-header {
+       display: flex; flex-direction: column; align-items: center;
+       margin-bottom: 30px; text-align: center;
+   }
+   .auth-header h1 {
+       font-size: 2.2rem; color: #FFD700; margin: 0;
+       text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+       text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+   }
+   .auth-header h3 {
+       font-size: 1.2rem; color: #E0E0E0; margin-top: 10px;
+       font-weight: normal; font-style: italic;
+   }
+   
+   .form-container {
+       background-color: #5A5B5E; border-radius: 20px; padding: 40px;
+       box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+       width: 100%; max-width: 450px; text-align: center;
+   }
+   
+   .form-group { margin-bottom: 20px; text-align: left; }
+   .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #FFD700; font-size: 0.9rem; text-transform: uppercase; }
+   
+   input, select {
+       width: 100%; padding: 12px; background-color: #48494B;
+       border: 2px solid #3A3B3D; border-radius: 8px; color: #fff;
+       font-size: 1rem; outline: none; font-family: 'Cambria', Georgia, serif;
+   }
+   input:focus, select:focus { border-color: #FFD700; }
+   
+   .btn-submit {
+       background-color: #FFD700; color: #000; font-weight: bold;
+       padding: 12px 30px; border: none; border-radius: 30px;
+       font-size: 1.1rem; cursor: pointer; width: 100%; margin-top: 15px;
+       font-family: 'Cambria', Georgia, serif; text-transform: uppercase;
+   }
+   .btn-submit:hover { transform: scale(1.05); background-color: #ffdb1a; }
+   
+   /* Link switch */
+   .switch-link { color: #FFD700; font-weight: bold; cursor: pointer; text-decoration: none; }
+   .switch-link:hover { text-decoration: underline; color: #fff; }
+   
+   .alert-error { background: rgba(255, 77, 77, 0.2); border: 1px solid #ff4d4d; color: #ff4d4d; padding: 10px; border-radius: 8px; margin-bottom: 20px; }
+   .backup-box { background: #48494B; padding: 15px; border: 2px dashed #FFD700; color: #FFD700; font-family: monospace; font-size: 1.4rem; margin: 20px 0; border-radius: 8px; display:flex; justify-content: space-around;}
+   
+   footer { background-color: #3A3B3D; border-top: 2px solid #5A5B5E; padding: 20px; text-align: center; color: #E0E0E0; font-size: 0.9rem; margin-top: auto; }
