@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 <?php
-    // CORREZIONE PERCORSI: Uso __DIR__
     include __DIR__ . '/richiesta.php';
 
     if (session_status() === PHP_SESSION_NONE) {

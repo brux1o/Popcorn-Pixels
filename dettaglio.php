@@ -327,7 +327,7 @@
             </form>
         <?php else: ?>
             <div class="login-alert">
-                <p>Devi essere <a href="login.php" style="color:#00ff00;">loggato</a> per commentare.</p>
+                <p>Devi essere <a href="accesso.php" style="color:#00ff00;">loggato</a> per commentare.</p>
             </div>
         <?php endif; ?>
     </div>
